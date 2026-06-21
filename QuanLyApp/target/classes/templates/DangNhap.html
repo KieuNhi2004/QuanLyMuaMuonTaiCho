@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Đăng Nhập</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --cream: #F5F0E8;
+            --espresso: #2C1A0E;
+            --caramel: #C8843A;
+            --latte: #D4A96A;
+            --foam: #FBF7F0;
+            --mid: #8C6A4A;
+            --border: rgba(44,26,14,0.12);
+        }
+
+        body {
+            font-family: 'Be Vietnam Pro', sans-serif;
+            background: var(--cream);
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .left-panel {
+            background: var(--espresso);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .left-panel::before {
+            content: '';
+            position: absolute;
+            width: 420px; height: 420px;
+            border-radius: 50%;
+            border: 1px solid rgba(200,132,58,0.2);
+            top: -100px; left: -100px;
+        }
+        .left-panel::after {
+            content: '';
+            position: absolute;
+            width: 280px; height: 280px;
+            border-radius: 50%;
+            border: 1px solid rgba(200,132,58,0.15);
+            bottom: -60px; right: -60px;
+        }
+
+        .brand {
+            text-align: center;
+            z-index: 1;
+        }
+
+        .brand-logo {
+            width: 72px; height: 72px;
+            background: var(--caramel);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+        }
+
+        .brand-logo svg {
+            width: 38px; height: 38px;
+            fill: var(--foam);
+        }
+
+        .brand h1 {
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--foam);
+            letter-spacing: -0.5px;
+            margin-bottom: 0.5rem;
+        }
+
+        .brand p {
+            font-size: 0.9rem;
+            color: var(--latte);
+            font-weight: 300;
+            line-height: 1.6;
+            max-width: 260px;
+        }
+
+        .decorative-dots {
+            display: flex;
+            gap: 8px;
+            margin-top: 2.5rem;
+        }
+
+        .decorative-dots span {
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: var(--caramel);
+            opacity: 0.5;
+        }
+        .decorative-dots span:nth-child(2) { opacity: 0.8; }
+        .decorative-dots span:nth-child(3) { opacity: 0.3; }
+
+        .right-panel {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 3rem;
+            background: var(--foam);
+        }
+
+        .form-card {
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .form-header {
+            margin-bottom: 2rem;
+        }
+
+        .form-header h2 {
+            font-size: 1.6rem;
+            font-weight: 600;
+            color: var(--espresso);
+            margin-bottom: 0.4rem;
+        }
+
+        .form-header p {
+            font-size: 0.875rem;
+            color: var(--mid);
+        }
+
+        .alert {
+            padding: 0.75rem 1rem;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            margin-bottom: 1.25rem;
+            font-weight: 500;
+        }
+
+        .alert-error {
+            background: #FEE2E2;
+            color: #991B1B;
+            border: 1px solid #FECACA;
+        }
+
+        .alert-success {
+            background: #D1FAE5;
+            color: #065F46;
+            border: 1px solid #A7F3D0;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--espresso);
+            margin-bottom: 0.5rem;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--mid);
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 2.75rem;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            font-size: 0.9rem;
+            font-family: inherit;
+            background: white;
+            color: var(--espresso);
+            transition: border-color 0.2s, box-shadow 0.2s;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: var(--caramel);
+            box-shadow: 0 0 0 3px rgba(200,132,58,0.12);
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 0.8rem;
+            background: var(--espresso);
+            color: var(--foam);
+            border: none;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-family: inherit;
+            font-weight: 500;
+            cursor: pointer;
+            margin-top: 0.5rem;
+            transition: background 0.2s, transform 0.1s;
+            letter-spacing: 0.2px;
+        }
+
+        .submit-btn:hover { background: #3D2510; }
+        .submit-btn:active { transform: scale(0.99); }
+
+        .form-footer {
+            text-align: center;
+            margin-top: 1.5rem;
+            font-size: 0.875rem;
+            color: var(--mid);
+        }
+
+        .form-footer a {
+            color: var(--caramel);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .form-footer a:hover { text-decoration: underline; }
+
+        @media (max-width: 768px) {
+            body { grid-template-columns: 1fr; }
+            .left-panel { padding: 2rem; min-height: 200px; }
+            .brand h1 { font-size: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="left-panel">
+    <div class="brand">
+        <div class="brand-logo">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M20 3H4v10c0 2.21 1.79 4 4 4h6c2.21 0 4-1.79 4-4v-3h2c1.11 0 2-.89 2-2V5c0-1.11-.89-2-2-2zm0 5h-2V5h2v3zM4 19h16v2H4z"/>
+            </svg>
+        </div>
+        <h1>Quản Lý Nhà Hàng</h1>
+        <p>Hệ thống quản lý bàn ăn và đặt món thông minh</p>
+        <div class="decorative-dots">
+            <span></span><span></span><span></span>
+        </div>
+    </div>
+</div>
+
+<div class="right-panel">
+    <div class="form-card">
+        <div class="form-header">
+            <h2>Đăng nhập</h2>
+            <p>Vui lòng nhập thông tin tài khoản của bạn</p>
+        </div>
+
+        <!-- Thymeleaf: hiển thị lỗi từ Spring Security -->
+        <div th:if="${param.error}" class="alert alert-error">
+            Tên đăng nhập hoặc mật khẩu không đúng.
+        </div>
+        <div th:if="${param.logout}" class="alert alert-success">
+            Bạn đã đăng xuất thành công.
+        </div>
+
+        <!-- action phải khớp với loginProcessingUrl trong SecurityConfig -->
+        <form th:action="@{/login}" method="post">
+            <!-- CSRF token Thymeleaf tự thêm khi dùng th:action -->
+            <div class="form-group">
+                <label for="username">Tên đăng nhập</label>
+                <div class="input-wrapper">
+                    <svg class="input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                        <circle cx="12" cy="7" r="4"/>
+                    </svg>
+                    <!-- name PHẢI là "username" để Spring Security nhận -->
+                    <input type="text" id="username" name="username"
+                           placeholder="Nhập tên đăng nhập" required autofocus/>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Mật khẩu</label>
+                <div class="input-wrapper">
+                    <svg class="input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                    </svg>
+                    <!-- name PHẢI là "password" -->
+                    <input type="password" id="password" name="password"
+                           placeholder="Nhập mật khẩu" required/>
+                </div>
+            </div>
+
+            <button type="submit" class="submit-btn">Đăng nhập</button>
+            <a th:href="@{/register}">Đăng kí</a>
+        </form>
+
+        
+    </div>
+</div>
+
+</body>
+</html>

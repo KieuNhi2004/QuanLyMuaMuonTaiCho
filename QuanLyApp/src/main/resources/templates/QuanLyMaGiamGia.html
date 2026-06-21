@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Quản Lý Mã Giảm Giá – Nhà Hàng HKN</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous"/>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet"/>
+    <style>
+        :root {
+            --cream: #fdf6ec;
+            --brown-dark: #2c1a0e;
+            --brown-mid: #6b3f1e;
+            --brown-light: #c8956c;
+            --gold: #d4a853;
+            --gold-light: #f0d080;
+            --white: #ffffff;
+            --shadow: 0 4px 24px rgba(44,26,14,0.12);
+            --green: #27ae60;
+            --red: #c0392b;
+            --orange: #e67e22;
+            --blue: #2980b9;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: var(--cream);
+            color: var(--brown-dark);
+            min-height: 100vh;
+        }
+
+        /* ===== NAVBAR ===== */
+        nav {
+            background: var(--brown-dark);
+            padding: 0 2.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 68px;
+            position: sticky; top: 0; z-index: 100;
+            box-shadow: 0 2px 16px rgba(0,0,0,0.3);
+        }
+
+        .nav-logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.6rem;
+            color: var(--gold);
+            letter-spacing: 1px;
+            text-decoration: none;
+        }
+
+        .nav-links { display: flex; align-items: center; gap: 1.8rem; list-style: none; }
+        .nav-links a {
+            color: #e8d8c4;
+            text-decoration: none;
+            font-size: 0.9rem; font-weight: 600; letter-spacing: 0.5px;
+            transition: color 0.2s;
+        }
+        .nav-links a:hover, .nav-links a.active { color: var(--gold-light); }
+
+        .nav-user { display: flex; align-items: center; gap: 0.7rem; color: var(--gold-light); font-size: 0.88rem; }
+        .nav-user .avatar {
+            width: 34px; height: 34px; border-radius: 50%;
+            background: var(--brown-mid); border: 2px solid var(--gold);
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; color: var(--gold); font-size: 0.85rem;
+        }
+
+        /* ===== HERO ===== */
+        .hero {
+            background: linear-gradient(135deg, var(--brown-dark) 0%, var(--brown-mid) 60%, var(--brown-light) 100%);
+            padding: 2.4rem 2.5rem 2rem;
+            text-align: center;
+            position: relative; overflow: hidden;
+        }
+        .hero::before {
+            content: ''; position: absolute; inset: 0;
+            background: radial-gradient(ellipse at 70% 50%, rgba(212,168,83,0.18) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .hero h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.2rem; color: var(--white);
+            margin-bottom: 0.3rem; position: relative;
+        }
+        .hero h1 span { color: var(--gold-light); font-style: italic; }
+        .hero p { color: #d4c0aa; font-size: 0.95rem; font-weight: 300; letter-spacing: 1px; }
+        .hero-divider { width: 60px; height: 3px; background: var(--gold); margin: 0.8rem auto 0; border-radius: 2px; }
+
+        /* ===== PAGE ===== */
+        .page { max-width: 1280px; margin: 0 auto; padding: 2rem 2rem 3rem; }
+
+        /* ===== CREATE BOX ===== */
+        .create-card {
+            background: var(--white);
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            margin-bottom: 1.6rem;
+        }
+
+        .create-card-header {
+            background: var(--brown-dark);
+            padding: 0.9rem 1.4rem;
+            display: flex; align-items: center; gap: 0.5rem;
+        }
+        .create-card-header h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.05rem; color: var(--gold-light); font-weight: 700;
+        }
+
+        .create-card-body { padding: 1.4rem 1.6rem 1.6rem; background: #fffaf3; }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .form-group { display: flex; flex-direction: column; gap: 0.3rem; }
+
+        .form-group label {
+            font-size: 0.78rem; font-weight: 700;
+            color: var(--brown-mid); text-transform: uppercase; letter-spacing: 0.4px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 0.52rem 0.85rem;
+            border: 1.5px solid #e0d0bc;
+            border-radius: 8px;
+            font-family: 'Nunito', sans-serif;
+            font-size: 0.87rem; color: var(--brown-dark);
+            background: var(--cream); outline: none;
+            transition: border-color 0.2s;
+            width: 100%;
+        }
+        .form-group input:focus, .form-group select:focus { border-color: var(--gold); }
+
+        .btn-create {
+            display: inline-flex; align-items: center; gap: 0.4rem;
+            padding: 0.55rem 1.4rem;
+            background: var(--green); color: white;
+            border: none; border-radius: 8px;
+            font-family: 'Nunito', sans-serif; font-size: 0.88rem; font-weight: 700;
+            cursor: pointer; transition: opacity 0.2s, transform 0.15s;
+        }
+        .btn-create:hover { opacity: 0.86; transform: translateY(-1px); }
+
+        /* ===== FILTER BAR ===== */
+        .filter-bar {
+            background: var(--white);
+            border-radius: 14px;
+            padding: 1rem 1.4rem;
+            box-shadow: var(--shadow);
+            display: flex; align-items: center; gap: 0.7rem; flex-wrap: wrap;
+            margin-bottom: 1.4rem;
+        }
+
+        .filter-bar input,
+        .filter-bar select {
+            padding: 0.46rem 0.85rem;
+            border: 1.5px solid #e0d0bc; border-radius: 8px;
+            font-family: 'Nunito', sans-serif;
+            font-size: 0.85rem; color: var(--brown-dark);
+            background: var(--cream); outline: none;
+            transition: border-color 0.2s;
+        }
+        .filter-bar input:focus, .filter-bar select:focus { border-color: var(--gold); }
+
+        .btn-filter {
+            padding: 0.48rem 1.1rem;
+            background: var(--brown-dark); color: var(--gold-light);
+            border: none; border-radius: 8px;
+            font-family: 'Nunito', sans-serif; font-size: 0.85rem; font-weight: 700;
+            cursor: pointer; transition: opacity 0.2s;
+        }
+        .btn-filter:hover { opacity: 0.87; }
+
+        .filter-label {
+            font-size: 0.78rem; font-weight: 700;
+            color: var(--brown-mid); text-transform: uppercase;
+            letter-spacing: 0.5px; padding-right: 0.5rem;
+            border-right: 1.5px solid #e0d0bc;
+            white-space: nowrap;
+        }
+
+        /* ===== TABLE CARD ===== */
+        .table-card {
+            background: var(--white);
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .table-card-header {
+            padding: 0.9rem 1.4rem;
+            background: var(--brown-dark);
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .table-card-header h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.05rem; color: var(--gold-light); font-weight: 700;
+        }
+        .table-card-header span { font-size: 0.8rem; color: #c8a87a; }
+
+        .table-wrap { overflow-x: auto; }
+
+        table { width: 100%; border-collapse: collapse; min-width: 700px; }
+
+        thead th {
+            background: #3e2412;
+            color: var(--gold-light);
+            font-size: 0.8rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.5px;
+            padding: 0.8rem 0.9rem; text-align: center;
+            border-bottom: 2px solid var(--gold);
+            white-space: nowrap;
+        }
+
+        tbody td {
+            padding: 0.65rem 0.9rem;
+            border-bottom: 1px solid #f0e6d6;
+            text-align: center;
+            font-size: 0.86rem;
+            vertical-align: middle;
+        }
+
+        tbody tr:hover td { background: #fdf0e3; }
+        tbody tr:last-child td { border-bottom: none; }
+
+        tbody td input[type="text"],
+        tbody td input[type="number"],
+        tbody td input[type="date"] {
+            padding: 0.36rem 0.58rem;
+            border: 1.5px solid #e0d0bc; border-radius: 6px;
+            font-family: 'Nunito', sans-serif;
+            font-size: 0.82rem; color: var(--brown-dark);
+            background: var(--cream);
+            width: 100%; max-width: 140px;
+            outline: none; transition: border-color 0.2s;
+        }
+        tbody td input:focus { border-color: var(--gold); }
+
+        /* Badges */
+        .badge {
+            display: inline-block;
+            padding: 0.22rem 0.68rem;
+            border-radius: 20px;
+            font-size: 0.75rem; font-weight: 700;
+            letter-spacing: 0.3px; white-space: nowrap;
+        }
+        .badge-active  { background: #eafaf1; color: #1e8449; border: 1px solid #a9dfbf; }
+        .badge-expired { background: #fdedec; color: #922b21; border: 1px solid #f1948a; }
+
+        .id-badge {
+            display: inline-block; background: #f0e6d6;
+            color: var(--brown-mid); font-weight: 700;
+            font-size: 0.78rem; padding: 0.18rem 0.55rem; border-radius: 20px;
+        }
+
+        /* Row action buttons */
+        .btn-action {
+            display: inline-flex; align-items: center; gap: 0.3rem;
+            padding: 0.34rem 0.85rem;
+            border-radius: 7px; border: none; cursor: pointer;
+            font-family: 'Nunito', sans-serif; font-size: 0.8rem; font-weight: 700;
+            transition: opacity 0.18s, transform 0.13s;
+            white-space: nowrap; color: white;
+        }
+        .btn-action:hover { opacity: 0.85; transform: translateY(-1px); }
+        .btn-update { background: var(--orange); }
+        .btn-delete { background: var(--red); }
+
+        /* ===== FOOTER ===== */
+        footer {
+            background: var(--brown-dark); color: #b09070;
+            text-align: center; padding: 1.2rem;
+            font-size: 0.82rem; letter-spacing: 0.5px;
+            margin-top: 2.5rem;
+        }
+        footer span { color: var(--gold); }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 900px) {
+            .form-grid { grid-template-columns: 1fr 1fr; }
+        }
+        @media (max-width: 600px) {
+            nav { padding: 0 1rem; }
+            .nav-links { gap: 1rem; }
+            .page { padding: 1.2rem 1rem 2rem; }
+            .hero h1 { font-size: 1.7rem; }
+            .form-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ===== NAVBAR ===== -->
+<nav>
+    <a class="nav-logo" href="/home">🍽 Nhà Hàng HKN</a>
+    <ul class="nav-links">
+        <li><a th:href="@{/}">Trang Chủ</a></li>
+        <li th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
+            <a th:href="@{/admin/users}">Quản Lí Người Dùng</a></li>
+        <li sec:authorize="hasRole('ADMIN')"><a href="#">Thống Kê</a></li>
+        <li th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
+            <a href="#">Quản Lí Kho</a></li>
+        <li th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
+            <a th:href="@{/logs}">Nhật Ký Chỉnh Sửa</a></li>
+        <li sec:authorize="hasAnyRole('ADMIN','NHANVIEN')">
+            <a th:href="@{/orders}">Quản Lí Đơn Hàng</a></li>
+    </ul>
+    <div class="nav-user" th:if="${currentUser != null}">
+                <div class="avatar"
+                     th:text="${#strings.substring(currentUser.tenDangNhap, 0, 1).toUpperCase()}">A</div>
+
+                <span th:text="${currentUser.tenDangNhap}">Admin</span>
+
+                <form th:action="@{/logout}" method="post" style="display:inline;">
+                    <button type="submit"
+                            style="background:none;border:none;color:#f08080;cursor:pointer;font-family:'Nunito',sans-serif;">
+                        Đăng xuất
+                    </button>
+                </form>
+            </div>
+
+            <div class="nav-user" th:unless="${currentUser != null}">
+                <a href="/login"
+                   style="color:var(--gold-light);text-decoration:none;font-weight:600;">
+                    Đăng nhập
+                </a>
+            </div>
+</nav>
+
+<!-- ===== HERO ===== -->
+<div class="hero">
+    <h1>🏷️ Quản Lý <span>Mã Giảm Giá</span></h1>
+    <p>Tạo và quản lý các chương trình khuyến mãi của nhà hàng</p>
+    <div class="hero-divider"></div>
+</div>
+
+<!-- ===== PAGE ===== -->
+<div class="page">
+
+    <!-- CREATE CARD -->
+    <div class="create-card">
+        <div class="create-card-header">
+            <h2>➕ Tạo mã giảm giá mới</h2>
+        </div>
+        <div class="create-card-body">
+            <form method="post" th:action="@{/admin/coupons/create}">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Giá trị giảm (đ)</label>
+                        <input type="number" name="giaTriGiam" placeholder="VD: 50000"/>
+                    </div>
+                    <div class="form-group">
+                        <label>Điều kiện áp dụng</label>
+                        <input type="text" name="dieuKien" placeholder="VD: Đơn từ 200.000đ"/>
+                    </div>
+                    <div class="form-group">
+                        <label>Ngày bắt đầu</label>
+                        <input type="date" name="ngayBatDau"/>
+                    </div>
+                    <div class="form-group">
+                        <label>Ngày kết thúc</label>
+                        <input type="date" name="ngayKetThuc"/>
+                    </div>
+                </div>
+                <button type="submit" class="btn-create">➕ Tạo mã giảm</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- FILTER BAR -->
+    <div class="filter-bar">
+        <form method="get" th:action="@{/admin/coupons}"
+              style="display:flex;align-items:center;gap:0.7rem;flex-wrap:wrap;width:100%;">
+
+            <span class="filter-label">🔍 Lọc</span>
+
+            <select name="trangThai">
+                <option value="">Tất cả trạng thái</option>
+                <option value="CON_HAN"  th:selected="${param.trangThai == 'CON_HAN'}">✅ Còn hạn</option>
+                <option value="HET_HAN"  th:selected="${param.trangThai == 'HET_HAN'}">❌ Hết hạn</option>
+            </select>
+
+            <input type="text"   name="dieuKien"  placeholder="Điều kiện..."
+                   th:value="${param.dieuKien}"/>
+
+            <input type="number" name="giaTriGiam" placeholder="Giá trị giảm"
+                   th:value="${param.giaTriGiam}" style="max-width:140px;"/>
+
+            <select name="sort">
+                <option value="desc" th:selected="${param.sort == 'desc'}">Ngày kết thúc ↓</option>
+                <option value="asc"  th:selected="${param.sort == 'asc'}">Ngày kết thúc ↑</option>
+            </select>
+
+            <button type="submit" class="btn-filter">🔍 Lọc</button>
+            <button type="reset"  class="btn-filter" style="background:var(--brown-mid);">↺ Đặt lại</button>
+        </form>
+    </div>
+
+    <!-- TABLE CARD -->
+    <div class="table-card">
+        <div class="table-card-header">
+            <h2>🏷️ Danh sách mã giảm giá</h2>
+            <span th:text="${coupons != null ? coupons.size() + ' mã' : '0 mã'}">0 mã</span>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Giá trị giảm</th>
+                        <th>Điều kiện</th>
+                        <th>Ngày bắt đầu</th>
+                        <th>Ngày kết thúc</th>
+                        <th>Trạng thái</th>
+                        <th>Hành động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="c : ${coupons}">
+                        <form method="post" th:action="@{/admin/coupons/update}">
+                            <input type="hidden" name="maGiamGia" th:value="${c.maGiamGia}"/>
+
+                            <!-- ID -->
+                            <td><span class="id-badge" th:text="'#' + ${c.maGiamGia}"></span></td>
+
+                            <!-- GIÁ TRỊ GIẢM -->
+                            <td>
+                                <input type="number" name="giaTriGiam" th:value="${c.giaTriGiam}"/>
+                            </td>
+
+                            <!-- ĐIỀU KIỆN -->
+                            <td>
+                                <input type="text" name="dieuKien" th:value="${c.dieuKien}"/>
+                            </td>
+
+                            <!-- NGÀY BẮT ĐẦU -->
+                            <td>
+                                <input type="date" name="ngayBatDau"
+                                       th:value="${#dates.format(c.ngayBatDau,'yyyy-MM-dd')}"/>
+                            </td>
+
+                            <!-- NGÀY KẾT THÚC -->
+                            <td>
+                                <input type="date" name="ngayKetThuc"
+                                       th:value="${#dates.format(c.ngayKetThuc,'yyyy-MM-dd')}"/>
+                            </td>
+
+                            <!-- TRẠNG THÁI -->
+                            <td>
+                                <span class="badge"
+                                      th:classappend="${c.ngayKetThuc != null and c.ngayKetThuc.after(new java.util.Date()) ? 'badge-active' : 'badge-expired'}"
+                                      th:text="${c.ngayKetThuc != null and c.ngayKetThuc.after(new java.util.Date()) ? '✅ Còn hạn' : '❌ Hết hạn'}">
+                                </span>
+                            </td>
+
+                            <!-- ACTIONS -->
+                            <td>
+                                <div style="display:flex;gap:6px;justify-content:center;">
+                                    <button type="submit" class="btn-action btn-update">✏️ Cập nhật</button>
+                                </div>
+                            </td>
+
+                        </form>
+                    </tr>
+
+                    <!-- EMPTY -->
+                    <tr th:if="${coupons == null or coupons.isEmpty()}">
+                        <td colspan="7" style="padding:2.5rem;color:#c8956c;font-style:italic;">
+                            Chưa có mã giảm giá nào.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<!-- ===== FOOTER ===== -->
+<footer>
+    &copy; 2025 <span>Nhà Hàng HKN</span> – Tất cả quyền được bảo lưu.
+</footer>
+
+</body>
+</html>

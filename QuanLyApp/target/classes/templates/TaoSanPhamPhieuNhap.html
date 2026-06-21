@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Thêm Sản Phẩm</title>
+</head>
+<body>
+
+<h2>THÊM SẢN PHẨM MỚI</h2>
+
+<form method="post"
+      action="/admin/sanpham/create-from-phieunhap"
+      enctype="multipart/form-data">
+
+    <!-- TÊN -->
+    <label>Tên sản phẩm:</label><br>
+    <input type="text" name="tenSanPham" required>
+    <br><br>
+
+    <!-- GIÁ -->
+    <label>Giá:</label><br>
+    <input type="number" name="gia" required>
+    <br><br>
+
+    <!-- LOẠI -->
+    <label>Tên loại:</label><br>
+    <input type="text" name="tenLoai" required>
+    <br><br>
+
+    <!-- GHI CHÚ -->
+    <label>Ghi chú:</label><br>
+    <input type="text" name="ghiChu">
+    <br><br>
+
+    <!-- ẢNH -->
+    <label>Hình ảnh:</label><br>
+    <input type="file" name="file">
+    <br><br>
+
+    <!-- ẨN NHÓM -->
+    <!-- Không cần nhập vì backend set = KHO -->
+
+    <!-- ẨN TRẠNG THÁI -->
+    <!-- Backend set = HET_HANG -->
+
+    <button type="submit">💾 Lưu sản phẩm</button>
+
+</form>
+
+<br>
+
+<a href="/phieunhap/create">⬅ Quay lại phiếu nhập</a>
+
+</body>
+</html>

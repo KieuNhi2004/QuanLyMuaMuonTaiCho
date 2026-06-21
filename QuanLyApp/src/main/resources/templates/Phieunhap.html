@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Tạo Phiếu Nhập</title>
+</head>
+<body>
+
+<h2>TẠO PHIẾU NHẬP</h2>
+
+<!-- NÚT THÊM SẢN PHẨM -->
+<a href="/admin/sanpham/create-from-phieunhap">
+    ➕ Thêm sản phẩm mới
+</a>
+
+<br><br>
+
+<form method="post" th:action="@{/phieunhap/create}">
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Sản phẩm</th>
+            <th>Số lượng</th>
+            <th>Giá nhập</th>
+        </tr>
+
+        <!-- tạo 5 dòng nhập -->
+        <tr th:each="i : ${#numbers.sequence(0,1)}">
+
+            <!-- CHỌN SẢN PHẨM -->
+            <td>
+                <select th:name="'details[' + ${i} + '].maSanPham'">
+                    <option value="">-- Chọn sản phẩm --</option>
+                    <option th:each="sp : ${sanphams}"
+                            th:value="${sp.maSanPham}"
+                            th:text="${sp.tenSanPham}">
+                    </option>
+                </select>
+            </td>
+
+            <!-- SỐ LƯỢNG -->
+            <td>
+                <input type="number"
+                       min="0"
+                       th:name="'details[' + ${i} + '].soLuong'"
+                       placeholder="Số lượng"/>
+            </td>
+
+            <!-- GIÁ -->
+            <td>
+                <input type="number"
+                       min="0"
+                       th:name="'details[' + ${i} + '].giaNhap'"
+                       placeholder="Giá nhập"/>
+            </td>
+
+        </tr>
+    </table>
+
+    <br>
+
+    <button type="submit">💾 Lưu phiếu nhập</button>
+
+</form>
+
+</body>
+</html>

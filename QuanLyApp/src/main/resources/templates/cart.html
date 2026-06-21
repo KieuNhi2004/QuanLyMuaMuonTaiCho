@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <title>Giỏ Hàng – Nhà Hàng HKN</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com"/>
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous"/>
+        <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet"/>
+        <style>
+            :root {
+                --cream: #fdf6ec;
+                --brown-dark: #2c1a0e;
+                --brown-mid: #6b3f1e;
+                --brown-light: #c8956c;
+                --gold: #d4a853;
+                --gold-light: #f0d080;
+                --white: #ffffff;
+                --shadow: 0 4px 24px rgba(44,26,14,0.12);
+                --red: #e05a3a;
+                --green: #27ae60;
+            }
+
+            * {
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
+            }
+
+            body {
+                font-family: 'Nunito', sans-serif;
+                background-color: var(--cream);
+                color: var(--brown-dark);
+                min-height: 100vh;
+                display: flex;
+                flex-direction: column;
+            }
+
+            /* ===== NAVBAR (đồng bộ trang chủ) ===== */
+            nav {
+                background: var(--brown-dark);
+                padding: 0 2.5rem;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                height: 68px;
+                position: sticky;
+                top: 0;
+                z-index: 100;
+                box-shadow: 0 2px 16px rgba(0,0,0,0.3);
+            }
+            .nav-logo {
+                font-family: 'Playfair Display', serif;
+                font-size: 1.6rem;
+                color: var(--gold);
+                letter-spacing: 1px;
+                text-decoration: none;
+            }
+            .nav-links {
+                display: flex;
+                align-items: center;
+                gap: 1.8rem;
+                list-style: none;
+            }
+            .nav-links a {
+                color: #e8d8c4;
+                text-decoration: none;
+                font-size: 0.9rem;
+                font-weight: 600;
+                letter-spacing: 0.5px;
+                transition: color 0.2s;
+            }
+            .nav-links a:hover, .nav-links a.active {
+                color: var(--gold-light);
+            }
+            .cart-badge {
+                background: var(--red);
+                color: white;
+                border-radius: 12px;
+                padding: 2px 8px;
+                font-size: 0.78rem;
+                font-weight: 700;
+                margin-left: 2px;
+            }
+            .nav-user {
+                display: flex;
+                align-items: center;
+                gap: 0.7rem;
+                color: var(--gold-light);
+                font-size: 0.88rem;
+            }
+            .nav-user .avatar {
+                width: 34px;
+                height: 34px;
+                border-radius: 50%;
+                background: var(--brown-mid);
+                border: 2px solid var(--gold);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: 700;
+                color: var(--gold);
+                font-size: 0.85rem;
+            }
+
+            /* ===== PAGE HEADER ===== */
+            .page-header {
+                background: linear-gradient(135deg, var(--brown-dark) 0%, var(--brown-mid) 70%);
+                padding: 2rem 2.5rem 1.8rem;
+                position: relative;
+                overflow: hidden;
+            }
+            .page-header::after {
+                content: '';
+                position: absolute;
+                inset: 0;
+                background: radial-gradient(ellipse at 80% 50%, rgba(212,168,83,0.15) 0%, transparent 70%);
+                pointer-events: none;
+            }
+            .page-header h1 {
+                font-family: 'Playfair Display', serif;
+                font-size: 2rem;
+                color: var(--white);
+                position: relative;
+                display: flex;
+                align-items: center;
+                gap: 0.7rem;
+            }
+            .page-header p {
+                color: #d4c0aa;
+                font-size: 0.9rem;
+                margin-top: 0.3rem;
+                font-weight: 300;
+                position: relative;
+            }
+            .back-btn {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.5rem;
+                background: rgba(255,255,255,0.12);
+                border: 1px solid rgba(212,168,83,0.4);
+                color: var(--gold-light);
+                padding: 0.4rem 1rem;
+                border-radius: 30px;
+                text-decoration: none;
+                font-size: 0.85rem;
+                font-weight: 600;
+                transition: all 0.2s;
+                margin-bottom: 1rem;
+                position: relative;
+            }
+            .back-btn:hover {
+                background: rgba(255,255,255,0.2);
+                color: white;
+            }
+
+            /* ===== MAIN LAYOUT ===== */
+            .cart-wrapper {
+                max-width: 900px;
+                margin: 2rem auto;
+                padding: 0 1.5rem 3rem;
+                flex: 1;
+                width: 100%;
+            }
+
+            /* ===== EMPTY STATE ===== */
+            .empty-cart {
+                text-align: center;
+                padding: 4rem 2rem;
+                background: var(--white);
+                border-radius: 20px;
+                box-shadow: var(--shadow);
+            }
+            .empty-cart .icon {
+                font-size: 4rem;
+                margin-bottom: 1rem;
+            }
+            .empty-cart h3 {
+                font-family: 'Playfair Display', serif;
+                font-size: 1.4rem;
+                color: var(--brown-dark);
+                margin-bottom: 0.5rem;
+            }
+            .empty-cart p {
+                color: var(--brown-light);
+                margin-bottom: 1.5rem;
+            }
+            .btn-primary {
+                display: inline-block;
+                background: var(--brown-dark);
+                color: var(--gold-light);
+                padding: 0.7rem 1.8rem;
+                border-radius: 30px;
+                text-decoration: none;
+                font-weight: 700;
+                font-size: 0.9rem;
+                transition: all 0.2s;
+            }
+            .btn-primary:hover {
+                background: var(--brown-mid);
+                transform: translateY(-2px);
+            }
+
+            /* ===== CART ITEMS LIST ===== */
+            .cart-section-title {
+                font-family: 'Playfair Display', serif;
+                font-size: 1.2rem;
+                color: var(--brown-dark);
+                padding-bottom: 0.6rem;
+                border-bottom: 2px solid var(--gold);
+                margin-bottom: 1rem;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+
+            .cart-items {
+                display: flex;
+                flex-direction: column;
+                gap: 0.8rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .cart-item {
+                background: var(--white);
+                border-radius: 14px;
+                box-shadow: var(--shadow);
+                display: flex;
+                align-items: center;
+                padding: 1rem 1.2rem;
+                gap: 1rem;
+                transition: box-shadow 0.2s;
+            }
+            .cart-item:hover {
+                box-shadow: 0 8px 28px rgba(44,26,14,0.16);
+            }
+
+            .item-icon {
+                width: 52px;
+                height: 52px;
+                border-radius: 12px;
+                background: linear-gradient(135deg, var(--brown-mid), var(--brown-light));
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1.5rem;
+                flex-shrink: 0;
+                overflow: hidden;
+            }
+            .item-icon img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                border-radius: 12px;
+            }
+
+            .item-info {
+                flex: 1;
+                min-width: 0;
+            }
+            .item-name {
+                font-family: 'Playfair Display', serif;
+                font-size: 1rem;
+                color: var(--brown-dark);
+                font-weight: 700;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            .item-unit-price {
+                color: var(--brown-light);
+                font-size: 0.82rem;
+                margin-top: 2px;
+            }
+
+            /* Inline stepper trong giỏ hàng */
+            .item-stepper {
+                display: flex;
+                align-items: center;
+                background: var(--cream);
+                border-radius: 30px;
+                border: 2px solid #e8d8c4;
+                overflow: hidden;
+            }
+            .stp-btn {
+                width: 32px;
+                height: 32px;
+                border: none;
+                background: transparent;
+                color: var(--brown-mid);
+                font-size: 1.1rem;
+                font-weight: 700;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: background 0.15s;
+            }
+            .stp-btn:hover {
+                background: #f0e6d6;
+            }
+            .stp-num {
+                min-width: 30px;
+                text-align: center;
+                font-weight: 700;
+                font-size: 0.95rem;
+                color: var(--brown-dark);
+            }
+
+            .item-subtotal {
+                color: var(--red);
+                font-weight: 700;
+                font-size: 1rem;
+                min-width: 90px;
+                text-align: right;
+                white-space: nowrap;
+            }
+
+            .item-remove {
+                background: none;
+                border: none;
+                cursor: pointer;
+                color: #ccc;
+                font-size: 1.1rem;
+                transition: color 0.2s;
+                padding: 4px;
+                border-radius: 50%;
+            }
+            .item-remove:hover {
+                color: var(--red);
+                background: #ffeaea;
+            }
+
+            /* ===== SUMMARY BOX ===== */
+            .summary-box {
+                background: var(--white);
+                border-radius: 18px;
+                box-shadow: var(--shadow);
+                padding: 1.5rem 1.8rem;
+                margin-top: 0.5rem;
+            }
+            .summary-row {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 0.5rem 0;
+                font-size: 0.95rem;
+                color: var(--brown-mid);
+                border-bottom: 1px dashed #e8d8c4;
+            }
+            .summary-row:last-of-type {
+                border-bottom: none;
+            }
+            .summary-total {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding-top: 1rem;
+                margin-top: 0.5rem;
+                border-top: 2px solid var(--gold);
+            }
+            .summary-total .label {
+                font-family: 'Playfair Display', serif;
+                font-size: 1.2rem;
+                color: var(--brown-dark);
+                font-weight: 700;
+            }
+            .summary-total .amount {
+                font-size: 1.4rem;
+                color: var(--red);
+                font-weight: 700;
+            }
+
+            /* ===== CHECKOUT BTN ===== */
+            .checkout-btn {
+                display: block;
+                width: 100%;
+                margin-top: 1.2rem;
+                background: var(--brown-dark);
+                color: var(--gold-light);
+                border: none;
+                border-radius: 14px;
+                padding: 1rem;
+                font-family: 'Playfair Display', serif;
+                font-size: 1.1rem;
+                font-weight: 700;
+                cursor: pointer;
+                transition: all 0.2s;
+                letter-spacing: 0.5px;
+                box-shadow: 0 4px 16px rgba(44,26,14,0.25);
+            }
+            .checkout-btn:hover {
+                background: var(--brown-mid);
+                transform: translateY(-2px);
+                box-shadow: 0 8px 24px rgba(44,26,14,0.3);
+            }
+
+            .note-text {
+                text-align: center;
+                margin-top: 0.8rem;
+                color: var(--brown-light);
+                font-size: 0.8rem;
+            }
+
+            /* ===== FOOTER ===== */
+            footer {
+                background: var(--brown-dark);
+                color: #b09070;
+                text-align: center;
+                padding: 1.2rem;
+                font-size: 0.82rem;
+                letter-spacing: 0.5px;
+            }
+            footer span {
+                color: var(--gold);
+            }
+
+            @media (max-width: 600px) {
+                .cart-item {
+                    flex-wrap: wrap;
+                }
+                .item-subtotal {
+                    min-width: auto;
+                }
+                nav {
+                    padding: 0 1rem;
+                }
+                .nav-links {
+                    gap: 1rem;
+                }
+            }
+        </style>
+    </head>
+    <body>
+
+        <!-- ===== NAVBAR ===== -->
+        <nav>
+            <a class="nav-logo" th:href="@{/}">🍽 Nhà Hàng HKN</a>
+            <ul class="nav-links">
+                <li><a th:href="@{/}">Trang Chủ</a></li>
+                <li th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
+                    <a href="#">Quản Lí Người Dùng</a></li>
+                <li sec:authorize="hasRole('ADMIN')">
+                    <a href="#">Thống Kê</a></li>
+                <li th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
+                    <a href="#">Quản Lí kho</a></li>
+                <li th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
+                    <a th:href="@{/logs}">Nhật Ký Chỉnh Sửa</a></li>
+                <li sec:authorize="hasAnyRole('ADMIN','NHANVIEN')">
+                    <a th:href="@{/orders}">Quản Lí Đơn Hàng</a></li>
+                <li th:if="${#authorization.expression('hasRole(''KHACHHANG'')')}">
+                    <a th:href="@{/cart}">
+                        🛒 Giỏ Hàng (<span th:text="${cart != null ? cart.soLuong : 0}">0</span>)
+                    </a>
+                </li>
+            </ul>
+            <div class="nav-user" th:if="${username != null}">
+                <div class="avatar" th:text="${#strings.substring(username, 0, 1).toUpperCase()}">U</div>
+                <span th:text="${username}">Người dùng</span>
+                <form th:action="@{/logout}" method="post" style="display:inline;">
+                    <button type="submit" style="background:none;border:none;color:#f08080;cursor:pointer;">Đăng xuất</button>
+                </form>
+            </div>
+            <div class="nav-user" th:unless="${username != null}">
+                <a href="/login" style="color:var(--gold-light);text-decoration:none;font-weight:600;">Đăng nhập</a>
+            </div>
+        </nav>
+
+        <!-- ===== PAGE HEADER ===== -->
+        <div class="page-header">
+            <a class="back-btn" th:href="@{/}">← Tiếp tục mua</a>
+            <h1>🛒 Giỏ Hàng</h1>
+            <p>Xem lại và xác nhận đơn hàng của bạn</p>
+        </div>
+
+        <!-- ===== CART WRAPPER ===== -->
+        <div class="cart-wrapper">
+
+            <!-- Giỏ rỗng -->
+            <div class="empty-cart" th:if="${cart.items.isEmpty()}">
+                <div class="icon">🛒</div>
+                <h3>Giỏ hàng trống</h3>
+                <p>Bạn chưa thêm món nào vào giỏ. Hãy khám phá thực đơn!</p>
+                <a th:href="@{/}" class="btn-primary">🍽 Xem thực đơn</a>
+            </div>
+
+            <!-- Giỏ có hàng -->
+            <div th:unless="${cart.items.isEmpty()}">
+
+                <div class="cart-section-title">
+                    📋 Các món đã chọn
+                </div>
+
+                <div class="cart-items">
+                    <div class="cart-item" th:each="item : ${cart.items.values()}">
+
+                        <!-- Icon / Ảnh -->
+                        <div class="item-icon">
+                            <span>🍽</span>
+                        </div>
+
+                        <!-- Tên & giá đơn vị -->
+                        <div class="item-info">
+                            <div class="item-name" th:text="${item.tenSanPham}">Tên món</div>
+                            <div class="item-unit-price"
+                                 th:text="${#numbers.formatDecimal(item.gia, 0, 'COMMA', 0, 'POINT')} + ' đ / phần'">
+                                50.000 đ / phần
+                            </div>
+                        </div>
+
+                        <!-- Số lượng – stepper dùng form POST -->
+                        <div class="item-stepper">
+                            <!-- Nút − : giảm 1; nếu về 0 thì remove -->
+                            <form th:action="@{/cart/update}" method="post" style="margin:0;">
+                                <input type="hidden" name="maSanPham" th:value="${item.maSanPham}"/>
+                                <input type="hidden" name="soLuong" th:value="${item.soLuong - 1}"/>
+                                <button type="submit" class="stp-btn">−</button>
+                            </form>
+
+                            <span class="stp-num" th:text="${item.soLuong}">1</span>
+
+                            <!-- Nút + : tăng 1 -->
+                            <form th:action="@{/cart/update}" method="post" style="margin:0;">
+                                <input type="hidden" name="maSanPham" th:value="${item.maSanPham}"/>
+                                <input type="hidden" name="soLuong" th:value="${item.soLuong + 1}"/>
+                                <button type="submit" class="stp-btn">+</button>
+                            </form>
+                        </div>
+
+                        <!-- Tổng tiền dòng -->
+                        <div class="item-subtotal"
+                             th:text="${#numbers.formatDecimal(item.gia * item.soLuong, 0, 'COMMA', 0, 'POINT')} + ' đ'">
+                            150.000 đ
+                        </div>
+
+                        <!-- Xóa hẳn -->
+                        <a th:href="@{/cart/remove/{id}(id=${item.maSanPham})}"
+                           class="item-remove" title="Xóa món">✕</a>
+
+                    </div>
+                </div>
+
+                <!-- Summary -->
+                <div class="summary-box">
+                    <div class="summary-row">
+                        <span>Số món</span>
+                        <span th:text="${cart.soLuong} + ' phần'">3 phần</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Phí dịch vụ</span>
+                        <span style="color:var(--green)">Miễn phí</span>
+                    </div>
+
+                    <div class="summary-total">
+                        <span class="label">Tổng cộng</span>
+                        <span class="amount"
+                              th:text="${#numbers.formatDecimal(cart.tongTien, 0, 'COMMA', 0, 'POINT')} + ' đ'">
+                            450.000 đ
+                        </span>
+                    </div>
+
+                    <form th:action="@{/cart/checkout}" method="post">
+                        <!-- GHI CHÚ -->
+                        <div style="margin-top:12px;">
+                            <textarea name="ghiChu"
+                                      placeholder="Nhập ghi chú (ví dụ: ít cay, không hành...)"
+                                      style="width:100%;
+                                      border-radius:10px;
+                                      padding:10px;
+                                      border:1px solid #ddd;
+                                      font-size:14px;"></textarea>
+                        </div>
+                        <button type="submit" class="checkout-btn">
+                            ✅ Đặt món ngay
+                        </button>
+                    </form>
+
+                    <p class="note-text">🔒 Đơn hàng sẽ được gửi đến bàn của bạn</p>
+                </div>
+
+            </div>
+        </div>
+
+        <footer>
+            &copy; 2025 <span>Nhà Hàng HKN</span> – Tất cả quyền được bảo lưu.
+        </footer>
+
+    </body>
+</html>

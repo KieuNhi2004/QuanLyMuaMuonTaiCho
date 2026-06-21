@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <title>Đăng Ký</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com"/>
+        <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+        <style>
+            *, *::before, *::after {
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
+            }
+
+            :root {
+                --cream: #F5F0E8;
+                --espresso: #2C1A0E;
+                --caramel: #C8843A;
+                --latte: #D4A96A;
+                --foam: #FBF7F0;
+                --mid: #8C6A4A;
+                --border: rgba(44,26,14,0.12);
+            }
+
+            body {
+                font-family: 'Be Vietnam Pro', sans-serif;
+                background: var(--cream);
+                min-height: 100vh;
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .left-panel {
+                background: var(--espresso);
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                padding: 3rem;
+                position: relative;
+                overflow: hidden;
+            }
+
+            .left-panel::before {
+                content: '';
+                position: absolute;
+                width: 420px;
+                height: 420px;
+                border-radius: 50%;
+                border: 1px solid rgba(200,132,58,0.2);
+                top: -100px;
+                left: -100px;
+            }
+            .left-panel::after {
+                content: '';
+                position: absolute;
+                width: 280px;
+                height: 280px;
+                border-radius: 50%;
+                border: 1px solid rgba(200,132,58,0.15);
+                bottom: -60px;
+                right: -60px;
+            }
+
+            .brand {
+                text-align: center;
+                z-index: 1;
+            }
+
+            .brand-logo {
+                width: 72px;
+                height: 72px;
+                background: var(--caramel);
+                border-radius: 20px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin: 0 auto 1.5rem;
+            }
+
+            .brand-logo svg {
+                width: 38px;
+                height: 38px;
+                fill: var(--foam);
+            }
+
+            .brand h1 {
+                font-size: 2rem;
+                font-weight: 600;
+                color: var(--foam);
+                letter-spacing: -0.5px;
+                margin-bottom: 0.5rem;
+            }
+
+            .brand p {
+                font-size: 0.9rem;
+                color: var(--latte);
+                font-weight: 300;
+                line-height: 1.6;
+                max-width: 260px;
+            }
+
+            .steps {
+                margin-top: 2.5rem;
+                display: flex;
+                flex-direction: column;
+                gap: 1rem;
+                text-align: left;
+            }
+
+            .step {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+            }
+
+            .step-num {
+                width: 28px;
+                height: 28px;
+                border-radius: 50%;
+                border: 1px solid var(--caramel);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 0.75rem;
+                font-weight: 600;
+                color: var(--caramel);
+                flex-shrink: 0;
+            }
+
+            .step-text {
+                font-size: 0.8rem;
+                color: var(--latte);
+                font-weight: 300;
+            }
+
+            .right-panel {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                padding: 3rem;
+                background: var(--foam);
+            }
+
+            .form-card {
+                width: 100%;
+                max-width: 400px;
+            }
+
+            .form-header {
+                margin-bottom: 2rem;
+            }
+
+            .form-header h2 {
+                font-size: 1.6rem;
+                font-weight: 600;
+                color: var(--espresso);
+                margin-bottom: 0.4rem;
+            }
+
+            .form-header p {
+                font-size: 0.875rem;
+                color: var(--mid);
+            }
+
+            .alert {
+                padding: 0.75rem 1rem;
+                border-radius: 10px;
+                font-size: 0.85rem;
+                margin-bottom: 1.25rem;
+                font-weight: 500;
+            }
+
+            .alert-error {
+                background: #FEE2E2;
+                color: #991B1B;
+                border: 1px solid #FECACA;
+            }
+
+            .alert-success {
+                background: #D1FAE5;
+                color: #065F46;
+                border: 1px solid #A7F3D0;
+            }
+
+            .form-group {
+                margin-bottom: 1.25rem;
+            }
+
+            label {
+                display: block;
+                font-size: 0.8rem;
+                font-weight: 500;
+                color: var(--espresso);
+                margin-bottom: 0.5rem;
+                letter-spacing: 0.3px;
+                text-transform: uppercase;
+            }
+
+            .input-wrapper {
+                position: relative;
+            }
+
+            .input-icon {
+                position: absolute;
+                left: 14px;
+                top: 50%;
+                transform: translateY(-50%);
+                color: var(--mid);
+            }
+
+            input[type="text"],
+            input[type="password"],
+            input[type="date"],
+            select {
+                width: 100%;
+                padding: 0.75rem 1rem 0.75rem 2.75rem;
+                border: 1.5px solid var(--border);
+                border-radius: 10px;
+                font-size: 0.9rem;
+                font-family: inherit;
+                background: white;
+                color: var(--espresso);
+                transition: border-color 0.2s, box-shadow 0.2s;
+                outline: none;
+                appearance: none;
+            }
+
+            select {
+                cursor: pointer;
+                background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238C6A4A' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+                background-repeat: no-repeat;
+                background-position: right 14px center;
+            }
+
+            input:focus, select:focus {
+                border-color: var(--caramel);
+                box-shadow: 0 0 0 3px rgba(200,132,58,0.12);
+            }
+
+            .hint {
+                font-size: 0.75rem;
+                color: var(--mid);
+                margin-top: 0.35rem;
+                opacity: 0.8;
+            }
+
+            /* ===== FIX: Ẩn section nhân viên mặc định ===== */
+            .section-divider {
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+                margin: 0.25rem 0 1rem;
+            }
+            .section-divider::before,
+            .section-divider::after {
+                content: '';
+                flex: 1;
+                height: 1px;
+                background: var(--border);
+            }
+            .section-divider span {
+                font-size: 0.75rem;
+                font-weight: 500;
+                color: var(--mid);
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                white-space: nowrap;
+            }
+            #khachhangSection {
+                overflow: hidden;
+                max-height: 0;
+                opacity: 0;
+                transition: max-height 0.35s ease, opacity 0.3s ease;
+            }
+            #khachhangSection.visible {
+                max-height: 300px;
+                opacity: 1;
+            }
+
+            #nhanvienSection {
+                overflow: hidden;
+                max-height: 0;        /* ẨN mặc định */
+                opacity: 0;
+                transition: max-height 0.35s ease, opacity 0.3s ease;
+            }
+            #nhanvienSection.visible {
+                max-height: 300px;    /* HIỆN khi có class visible */
+                opacity: 1;
+            }
+            /* ============================================== */
+
+            .submit-btn {
+                width: 100%;
+                padding: 0.8rem;
+                background: var(--espresso);
+                color: var(--foam);
+                border: none;
+                border-radius: 10px;
+                font-size: 0.95rem;
+                font-family: inherit;
+                font-weight: 500;
+                cursor: pointer;
+                margin-top: 0.5rem;
+                transition: background 0.2s, transform 0.1s;
+                letter-spacing: 0.2px;
+            }
+
+            .submit-btn:hover {
+                background: #3D2510;
+            }
+            .submit-btn:active {
+                transform: scale(0.99);
+            }
+
+            .form-footer {
+                text-align: center;
+                margin-top: 1.5rem;
+                font-size: 0.875rem;
+                color: var(--mid);
+            }
+
+            .form-footer a {
+                color: var(--caramel);
+                text-decoration: none;
+                font-weight: 500;
+            }
+
+            .form-footer a:hover {
+                text-decoration: underline;
+            }
+
+            @media (max-width: 768px) {
+                body {
+                    grid-template-columns: 1fr;
+                }
+                .left-panel {
+                    padding: 2rem;
+                    min-height: 200px;
+                }
+            }
+        </style>
+    </head>
+    <body>
+
+        <div class="left-panel">
+            <div class="brand">
+                <div class="brand-logo">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M20 3H4v10c0 2.21 1.79 4 4 4h6c2.21 0 4-1.79 4-4v-3h2c1.11 0 2-.89 2-2V5c0-1.11-.89-2-2-2zm0 5h-2V5h2v3zM4 19h16v2H4z"/>
+                    </svg>
+                </div>
+                <h1>Quản Lý Nhà Hàng</h1>
+                <p>Tạo tài khoản để bắt đầu quản lý</p>
+
+                <div class="steps">
+                    <div class="step">
+                        <div class="step-num">1</div>
+                        <div class="step-text">Điền thông tin tài khoản</div>
+                    </div>
+                    <div class="step">
+                        <div class="step-num">2</div>
+                        <div class="step-text">Chọn vai trò phù hợp</div>
+                    </div>
+                    <div class="step">
+                        <div class="step-num">3</div>
+                        <div class="step-text">Đăng nhập và sử dụng</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="right-panel">
+            <div class="form-card">
+                <div class="form-header">
+                    <h2>Đăng ký</h2>
+                    <p>Tạo tài khoản mới cho hệ thống</p>
+                </div>
+
+                <div th:if="${param.error}" class="alert alert-error">
+                    Đã xảy ra lỗi. Tên đăng nhập có thể đã tồn tại.
+                </div>
+                <div th:if="${param.success}" class="alert alert-success">
+                    Đăng ký thành công! <a th:href="@{/login}" style="color:#065F46; font-weight:600;">Đăng nhập ngay</a>
+                </div>
+
+                <form th:action="@{/register}" method="post" enctype="multipart/form-data">
+
+                    <!-- Tên đăng nhập -->
+                    <div class="form-group">
+                        <label for="tenDangNhap">Tên đăng nhập</label>
+                        <div class="input-wrapper">
+                            <svg class="input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                 stroke="currentColor" stroke-width="2">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                            <circle cx="12" cy="7" r="4"/>
+                            </svg>
+                            <input type="text" id="tenDangNhap" name="tenDangNhap"
+                                   placeholder="Ít nhất 4 ký tự" required minlength="4"/>
+                        </div>
+                    </div>
+
+                    <!-- Mật khẩu -->
+                    <div class="form-group">
+                        <label for="matKhau">Mật khẩu</label>
+                        <div class="input-wrapper">
+                            <svg class="input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                 stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                            </svg>
+                            <input type="password" id="matKhau" name="matKhau"
+                                   placeholder="Ít nhất 6 ký tự" required minlength="6"/>
+                        </div>
+                        <div class="hint">Mật khẩu sẽ được mã hóa BCrypt</div>
+                    </div>
+
+                    <!-- Ảnh đại diện -->
+                    <div class="form-group">
+                        <label for="avatar">Ảnh đại diện</label>
+                        <div class="input-wrapper">
+                            <input type="file" id="avatar" name="avatar" accept="image/*" required/>
+                        </div>
+                        <div class="hint">Chọn ảnh JPG/PNG</div>
+                    </div>
+
+                    <!-- Vai trò -->
+                    <div class="form-group">
+                        <label for="vaiTro">Vai trò</label>
+                        <div class="input-wrapper">
+                            <svg class="input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                 stroke="currentColor" stroke-width="2">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                            <circle cx="9" cy="7" r="4"/>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
+                            </svg>
+                            <select id="vaiTro" name="vaiTro" required onchange="toggleNhanvienSection(this.value)">
+                                <option value="" disabled selected>-- Chọn vai trò --</option>
+                                <option value="ADMIN">Admin</option>
+                                <option value="NHANVIEN">Nhân viên</option>
+                                <option value="KHACHHANG">Khách hàng</option>
+                            </select>
+                        </div>
+                        <div class="hint">Quyết định quyền truy cập trong hệ thống</div>
+                    </div>
+
+                    <!-- PHẦN NHÂN VIÊN — ẩn mặc định bằng CSS max-height: 0 -->
+                    <div id="nhanvienSection">
+                        <div class="section-divider">
+                            <span>Thông tin nhân viên</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="hoTen">Họ và tên</label>
+                            <div class="input-wrapper">
+                                <svg class="input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                     stroke="currentColor" stroke-width="2">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                                <circle cx="12" cy="7" r="4"/>
+                                </svg>
+                                <input type="text" id="hoTen" name="hoTen" placeholder="Nguyễn Văn A"/>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="ngaySinh">Ngày sinh</label>
+                            <div class="input-wrapper">
+                                <svg class="input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                     stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                                <line x1="16" y1="2" x2="16" y2="6"/>
+                                <line x1="8" y1="2" x2="8" y2="6"/>
+                                <line x1="3" y1="10" x2="21" y2="10"/>
+                                </svg>
+                                <input type="date" id="ngaySinh" name="ngaySinh"/>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- PHẦN KHÁCH HÀNG — bàn ăn mới -->
+                    <div id="khachhangSection">
+                        <div class="section-divider">
+                            <span>Thông tin bàn ăn</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="tenBan">Tên bàn</label>
+                            <div class="input-wrapper">
+                                <svg class="input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                     stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="8" width="18" height="4" rx="1"/>
+                                <line x1="12" y1="12" x2="12" y2="20"/>
+                                <line x1="8" y1="20" x2="16" y2="20"/>
+                                </svg>
+                                <input type="text" id="tenBan" name="tenBan" placeholder="VD: Bàn 01"/>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="soCho">Số chỗ ngồi</label>
+                            <div class="input-wrapper">
+                                <svg class="input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                     stroke="currentColor" stroke-width="2">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                                <circle cx="9" cy="7" r="4"/>
+                                <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
+                                </svg>
+                                <input type="number" id="soCho" name="soCho" placeholder="4" min="1" max="20"/>
+                            </div>
+                            <div class="hint">Để trống nếu chưa xác định — hệ thống mặc định 4 chỗ</div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="submit-btn">Tạo tài khoản</button>
+                </form>
+
+                <div th:if="${errMsg}" class="alert alert-error" style="margin-top:1rem;">
+                    <span th:text="${errMsg}"></span>
+                </div>
+
+                <div class="form-footer">
+                    Đã có tài khoản? <a th:href="@{/login}">Đăng nhập</a>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            function toggleNhanvienSection(role) {
+                var nvSection = document.getElementById('nhanvienSection');
+                var khSection = document.getElementById('khachhangSection');
+                var hoTenInput = document.getElementById('hoTen');
+
+                // Reset cả hai
+                nvSection.classList.remove('visible');
+                khSection.classList.remove('visible');
+                hoTenInput.removeAttribute('required');
+                hoTenInput.value = '';
+                document.getElementById('ngaySinh').value = '';
+
+                if (role === 'NHANVIEN') {
+                    nvSection.classList.add('visible');
+                    hoTenInput.setAttribute('required', 'required');
+                } else if (role === 'KHACHHANG') {
+                    khSection.classList.add('visible');
+                }
+            }
+        </script>
+
+    </body>
+</html>

@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <title>Quản Lý Đơn Hàng – Nhà Hàng HKN</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com"/>
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous"/>
+        <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet"/>
+        <style>
+            :root {
+                --cream: #fdf6ec;
+                --brown-dark: #2c1a0e;
+                --brown-mid: #6b3f1e;
+                --brown-light: #c8956c;
+                --gold: #d4a853;
+                --gold-light: #f0d080;
+                --white: #ffffff;
+                --shadow: 0 4px 24px rgba(44,26,14,0.12);
+                --red: #e05a3a;
+                --green: #27ae60;
+                --orange: #e88a2e;
+            }
+
+            * {
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
+            }
+
+            body {
+                font-family: 'Nunito', sans-serif;
+                background-color: var(--cream);
+                color: var(--brown-dark);
+                min-height: 100vh;
+                display: flex;
+                flex-direction: column;
+            }
+
+            /* ===== NAVBAR ===== */
+            nav {
+                background: var(--brown-dark);
+                padding: 0 2.5rem;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                height: 68px;
+                position: sticky;
+                top: 0;
+                z-index: 100;
+                box-shadow: 0 2px 16px rgba(0,0,0,0.3);
+            }
+            .nav-logo {
+                font-family: 'Playfair Display', serif;
+                font-size: 1.6rem;
+                color: var(--gold);
+                letter-spacing: 1px;
+                text-decoration: none;
+            }
+            .nav-links {
+                display: flex;
+                align-items: center;
+                gap: 1.8rem;
+                list-style: none;
+            }
+            .nav-links a {
+                color: #e8d8c4;
+                text-decoration: none;
+                font-size: 0.9rem;
+                font-weight: 600;
+                letter-spacing: 0.5px;
+                transition: color 0.2s;
+            }
+            .nav-links a:hover, .nav-links a.active {
+                color: var(--gold-light);
+            }
+            .cart-badge {
+                background: var(--red);
+                color: white;
+                border-radius: 12px;
+                padding: 2px 8px;
+                font-size: 0.78rem;
+                font-weight: 700;
+                margin-left: 2px;
+            }
+            .nav-user {
+                display: flex;
+                align-items: center;
+                gap: 0.7rem;
+                color: var(--gold-light);
+                font-size: 0.88rem;
+            }
+            .nav-user .avatar {
+                width: 34px;
+                height: 34px;
+                border-radius: 50%;
+                background: var(--brown-mid);
+                border: 2px solid var(--gold);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: 700;
+                color: var(--gold);
+                font-size: 0.85rem;
+            }
+
+            /* ===== PAGE HEADER ===== */
+            .page-header {
+                background: linear-gradient(135deg, var(--brown-dark) 0%, var(--brown-mid) 70%);
+                padding: 2rem 2.5rem 1.8rem;
+                position: relative;
+                overflow: hidden;
+            }
+            .page-header::after {
+                content: '';
+                position: absolute;
+                inset: 0;
+                background: radial-gradient(ellipse at 80% 50%, rgba(212,168,83,0.15) 0%, transparent 70%);
+                pointer-events: none;
+            }
+            .page-header h1 {
+                font-family: 'Playfair Display', serif;
+                font-size: 2rem;
+                color: var(--white);
+                position: relative;
+                display: flex;
+                align-items: center;
+                gap: 0.7rem;
+            }
+            .page-header p {
+                color: #d4c0aa;
+                font-size: 0.9rem;
+                margin-top: 0.3rem;
+                font-weight: 300;
+                position: relative;
+            }
+
+            /* ===== MAIN WRAPPER ===== */
+            .wrapper {
+                max-width: 900px;
+                margin: 2rem auto;
+                padding: 0 1.5rem 3rem;
+                flex: 1;
+                width: 100%;
+            }
+
+            /* ===== SECTION TITLE ===== */
+            .section-title {
+                font-family: 'Playfair Display', serif;
+                font-size: 1.2rem;
+                color: var(--brown-dark);
+                padding-bottom: 0.6rem;
+                border-bottom: 2px solid var(--gold);
+                margin-bottom: 1rem;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+
+            /* ===== FILTER BOX ===== */
+            .filter-box {
+                background: var(--white);
+                border-radius: 16px;
+                box-shadow: var(--shadow);
+                padding: 1.2rem 1.5rem;
+                margin-bottom: 1.5rem;
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                gap: 0.8rem;
+            }
+            .filter-box select,
+            .filter-box input[type="number"] {
+                padding: 0.5rem 0.8rem;
+                border: 2px solid #e8d8c4;
+                border-radius: 30px;
+                background: var(--cream);
+                color: var(--brown-dark);
+                font-family: 'Nunito', sans-serif;
+                font-size: 0.88rem;
+                font-weight: 600;
+                outline: none;
+                transition: border-color 0.2s;
+            }
+            .filter-box select:focus,
+            .filter-box input[type="number"]:focus {
+                border-color: var(--gold);
+            }
+            .filter-btn {
+                background: var(--brown-dark);
+                color: var(--gold-light);
+                border: none;
+                padding: 0.5rem 1.2rem;
+                border-radius: 30px;
+                font-family: 'Nunito', sans-serif;
+                font-size: 0.88rem;
+                font-weight: 700;
+                cursor: pointer;
+                transition: all 0.2s;
+            }
+            .filter-btn:hover {
+                background: var(--brown-mid);
+                transform: translateY(-1px);
+            }
+
+            /* ===== ORDER CARD ===== */
+            .order-list {
+                display: flex;
+                flex-direction: column;
+                gap: 0.8rem;
+            }
+
+            .order-card {
+                background: var(--white);
+                border-radius: 14px;
+                box-shadow: var(--shadow);
+                padding: 1.2rem 1.5rem;
+                display: flex;
+                align-items: center;
+                gap: 1.2rem;
+                transition: box-shadow 0.2s;
+            }
+            .order-card:hover {
+                box-shadow: 0 8px 28px rgba(44,26,14,0.16);
+            }
+
+            .order-icon {
+                width: 52px;
+                height: 52px;
+                border-radius: 12px;
+                background: linear-gradient(135deg, var(--brown-mid), var(--brown-light));
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1.4rem;
+                flex-shrink: 0;
+            }
+
+            .order-info {
+                flex: 1;
+                min-width: 0;
+            }
+            .order-title {
+                font-family: 'Playfair Display', serif;
+                font-size: 1rem;
+                font-weight: 700;
+                color: var(--brown-dark);
+            }
+            .order-meta {
+                color: var(--brown-light);
+                font-size: 0.82rem;
+                margin-top: 3px;
+                display: flex;
+                gap: 1rem;
+                flex-wrap: wrap;
+            }
+            .order-meta span {
+                display: flex;
+                align-items: center;
+                gap: 3px;
+            }
+
+            .status-badge {
+                display: inline-block;
+                padding: 3px 12px;
+                border-radius: 20px;
+                font-size: 0.78rem;
+                font-weight: 700;
+                letter-spacing: 0.3px;
+            }
+            .status-DANG_XU_LY {
+                background: #fff3e0;
+                color: var(--orange);
+            }
+            .status-HOAN_THANH {
+                background: #e8f8ef;
+                color: var(--green);
+            }
+
+            .detail-btn {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.4rem;
+                background: var(--brown-dark);
+                color: var(--gold-light);
+                padding: 0.5rem 1.1rem;
+                border-radius: 30px;
+                text-decoration: none;
+                font-size: 0.85rem;
+                font-weight: 700;
+                transition: all 0.2s;
+                white-space: nowrap;
+            }
+            .detail-btn:hover {
+                background: var(--brown-mid);
+                transform: translateY(-1px);
+            }
+
+            /* ===== EMPTY STATE ===== */
+            .empty-state {
+                text-align: center;
+                padding: 4rem 2rem;
+                background: var(--white);
+                border-radius: 20px;
+                box-shadow: var(--shadow);
+            }
+            .empty-state .icon {
+                font-size: 4rem;
+                margin-bottom: 1rem;
+            }
+            .empty-state h3 {
+                font-family: 'Playfair Display', serif;
+                font-size: 1.4rem;
+                color: var(--brown-dark);
+                margin-bottom: 0.5rem;
+            }
+            .empty-state p {
+                color: var(--brown-light);
+            }
+
+            /* ===== FOOTER ===== */
+            footer {
+                background: var(--brown-dark);
+                color: #b09070;
+                text-align: center;
+                padding: 1.2rem;
+                font-size: 0.82rem;
+                letter-spacing: 0.5px;
+            }
+            footer span {
+                color: var(--gold);
+            }
+
+            @media (max-width: 600px) {
+                nav {
+                    padding: 0 1rem;
+                }
+                .nav-links {
+                    gap: 1rem;
+                }
+                .order-card {
+                    flex-wrap: wrap;
+                }
+                .filter-box {
+                    flex-direction: column;
+                    align-items: stretch;
+                }
+            }
+        </style>
+    </head>
+    <body>
+
+        <!-- ===== NAVBAR ===== -->
+        <nav>
+            <a class="nav-logo" th:href="@{/}">🍽 Nhà Hàng HKN</a>
+            <ul class="nav-links">
+                <li><a th:href="@{/}">Trang Chủ</a></li>
+                <li th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
+                    <a href="#">Quản Lí Người Dùng</a></li>
+                <li sec:authorize="hasRole('ADMIN')">
+                    <a href="#">Thống Kê</a></li>
+                <li th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
+                    <a href="#">Quản Lí kho</a></li>
+                <li th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
+                    <a th:href="@{/logs}">Nhật Ký Chỉnh Sửa</a></li>
+                <li sec:authorize="hasAnyRole('ADMIN','NHANVIEN')">
+                    <a th:href="@{/orders}">Quản Lí Đơn Hàng</a></li>
+                <li th:if="${#authorization.expression('hasRole(''KHACHHANG'')')}">
+                    <a th:href="@{/cart}">
+                        🛒 Giỏ Hàng (<span th:text="${cart != null ? cart.soLuong : 0}">0</span>)
+                    </a>
+                </li>
+            </ul>
+            <div class="nav-user" th:if="${username != null}">
+                <div class="avatar" th:text="${#strings.substring(username, 0, 1).toUpperCase()}">U</div>
+                <span th:text="${username}">Người dùng</span>
+                <form th:action="@{/logout}" method="post" style="display:inline;">
+                    <button type="submit" style="background:none;border:none;color:#f08080;cursor:pointer;">Đăng xuất</button>
+                </form>
+            </div>
+            <div class="nav-user" th:unless="${username != null}">
+                <a href="/login" style="color:var(--gold-light);text-decoration:none;font-weight:600;">Đăng nhập</a>
+            </div>
+        </nav>
+
+        <!-- ===== PAGE HEADER ===== -->
+        <div class="page-header">
+            <h1>📋 Quản Lý Đơn Hàng</h1>
+            <p>Theo dõi và xử lý tất cả đơn hàng của nhà hàng</p>
+        </div>
+
+        <!-- ===== WRAPPER ===== -->
+        <div class="wrapper">
+
+            <!-- FILTER -->
+            <form method="get" class="filter-box">
+                <select name="trangThai">
+                    <option value="">-- Trạng thái --</option>
+                    <option value="DANG_XU_LY">Đang xử lý</option>
+                    <option value="HOAN_THANH">Hoàn thành</option>
+                </select>
+                <input type="number" name="maBan" placeholder="Mã bàn"/>
+                <select name="time">
+                    <option value="">-- Thời gian --</option>
+                    <option value="today">24h gần nhất</option>
+                </select>
+                <select name="payStatus" sec:authorize="hasRole('ADMIN')">
+                    <option value="">-- Thanh toán --</option>
+                    <option value="paid">Đã thanh toán</option>
+                    <option value="unpaid">Chưa thanh toán</option>
+                </select>
+                <button type="submit" class="filter-btn">🔍 Lọc</button>
+                <button type="submit" class="filter-btn">Bàn ăn</button>
+            </form>
+
+            <!-- SECTION TITLE -->
+            <div class="section-title">🧾 Danh sách đơn hàng</div>
+
+            <!-- EMPTY STATE -->
+            <div class="empty-state" th:if="${orders == null || orders.isEmpty()}">
+                <div class="icon">📭</div>
+                <h3>Không có đơn hàng nào</h3>
+                <p>Hiện tại chưa có đơn hàng phù hợp với bộ lọc.</p>
+            </div>
+
+            <!-- ORDER LIST -->
+            <div class="order-list" th:unless="${orders == null || orders.isEmpty()}">
+                <div class="order-card" th:each="o : ${orders}">
+                    <div class="order-icon">🧾</div>
+                    <div class="order-info">
+                        <div class="order-title">
+                            Đơn #<span th:text="${o.maDonHang}"></span>
+                            &nbsp;
+                            <span class="status-badge"
+                                  th:classappend="'status-' + ${o.trangThai}"
+                                  th:text="${o.trangThai == 'DANG_XU_LY' ? 'Đang xử lý' : 'Hoàn thành'}">
+                            </span>
+                        </div>
+                        <div class="order-meta">
+                            <span>🪑 Bàn <b th:text="${o.maBan.maBan}"></b></span>
+                            <span>🕐 <span th:text="${o.thoiGianBatDau}"></span></span>
+                        </div>
+                    </div>
+                    <a th:href="@{/orders/{id}(id=${o.maDonHang})}" class="detail-btn">Xem chi tiết →</a>
+                </div>
+            </div>
+
+        </div>
+
+        <footer>
+            &copy; 2025 <span>Nhà Hàng HKN</span> – Tất cả quyền được bảo lưu.
+        </footer>
+
+    </body>
+</html>

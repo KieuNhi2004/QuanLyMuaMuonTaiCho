@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Thống kê đơn giản</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+</head>
+<body>
+
+<h1>📊 Thống kê</h1>
+
+<hr>
+
+<!-- DOANH THU -->
+<h2>💰 Doanh thu</h2>
+<p th:text="${doanhThu}">0</p>
+
+<hr>
+
+<!-- TOP SẢN PHẨM -->
+<h2>🏆 Sản phẩm doanh thu cao nhất</h2>
+
+<div th:if="${topSPDoanhThu != null and !#lists.isEmpty(topSPDoanhThu)}">
+
+    <div th:each="sp : ${topSPDoanhThu}">
+        <p>
+            Tên:
+            <span th:text="${sp['tenSanPham']}"></span>
+        </p>
+        <p>
+            Doanh thu:
+            <span th:text="${sp['doanhThu']}"></span>
+        </p>
+        <hr>
+    </div>
+
+</div>
+
+<div th:if="${topSPDoanhThu == null or #lists.isEmpty(topSPDoanhThu)}">
+    ❌ Không có dữ liệu sản phẩm
+</div>
+
+<hr>
+
+<!-- TOP NHÂN VIÊN -->
+<h2>👤 Nhân viên bán nhiều nhất</h2>
+
+<div th:each="nv, i : ${topNV}">
+    <p>
+        #<span th:text="${i.index + 1}"></span> -
+        <span th:text="${nv['tenNhanVien']}"></span>
+        :
+        <span th:text="${nv['doanhThu']}"></span>
+    </p>
+</div>
+
+<div th:if="${topNV == null or #lists.isEmpty(topNV)}">
+    ❌ Không có dữ liệu nhân viên
+</div>
+
+<hr>
+
+<!-- DEBUG FULL LIST -->
+<h2>🧪 Debug dữ liệu</h2>
+
+<h3>Top sản phẩm:</h3>
+<div th:each="sp, i : ${topSP}">
+    <p>
+        #<span th:text="${i.index + 1}"></span> -
+        <span th:text="${sp['tenSanPham']}"></span>
+        :
+        <span th:text="${sp['soLuong']}"></span>
+    </p>
+</div>
+
+<div th:if="${topSP == null or #lists.isEmpty(topSP)}">
+    ❌ Không có dữ liệu sản phẩm
+</div>
+
+<h3>Top nhân viên:</h3>
+
+<div th:each="nv, i : ${topNV}">
+    <p>
+        <span th:text="${nv['tenNhanVien']}"></span>
+        :
+        <span th:text="${nv['doanhThu']}"></span>
+    </p>
+</div>
+
+<div th:if="${topNV == null or #lists.isEmpty(topNV)}">
+    ❌ Không có dữ liệu nhân viên
+</div>
+<h2>🧾 Số lượng hóa đơn</h2>
+<p th:text="${soHoaDon}"></p>
+<h2>🏆 Top sản phẩm (Nhóm MƯỢN)</h2>
+
+<div th:each="sp, i : ${topSPMuon}">
+    <p>
+        #<span th:text="${i.index + 1}"></span> -
+        <span th:text="${sp['tenSanPham']}"></span>
+        :
+        <span th:text="${sp['soLuong']}"></span>
+    </p>
+</div>
+<h2>📈 Doanh thu theo ngày</h2>
+<canvas id="lineChart"></canvas>
+
+<script th:inline="javascript">
+    let dataNgay = /*[[${chartNgay}]]*/ [];
+
+    let labels = dataNgay.map(x => x.ngay);
+    let data = dataNgay.map(x => x.doanhThu);
+
+    new Chart(document.getElementById('lineChart'), {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Doanh thu',
+                data: data,
+                borderWidth: 2,
+                fill: false
+            }]
+        }
+    });
+</script>
+<h2>🥧 Tần suất cho mượn theo thể loại</h2>
+<canvas id="pieMuon" style="max-width:400px; max-height:400px;"></canvas>
+
+<script th:inline="javascript">
+    document.addEventListener("DOMContentLoaded", function () {
+
+    let dataSP = [
+        {"tenSanPham":"AN","soLuong":3},
+        {"tenSanPham":"Từ điển tiếng nhật","soLuong":2}
+    ];
+
+    let labels = dataSP.map(x => x.tenSanPham);
+    let data = dataSP.map(x => x.soLuong);
+
+    new Chart(document.getElementById('pieMuon'), {
+        type: 'pie',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: data
+            }]
+        },
+        plugins: [ChartDataLabels],
+        options: {
+            plugins: {
+                datalabels: {
+                    color: '#fff',
+                    font: {
+                        weight: 'bold'
+                    },
+                    formatter: (value, ctx) => {
+                        let total = ctx.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+                        let percent = (value / total * 100).toFixed(1);
+                        return percent + '%';
+                    }
+                }
+            }
+        }
+    });
+
+});
+</script>
+<h2>📊 Doanh thu theo nhân viên</h2>
+<form th:action="@{/stats}" method="get">
+    <label>Chọn Top:</label>
+    <select name="limit">
+        <option value="5" th:selected="${limit == 5}">Top 5</option>
+        <option value="10" th:selected="${limit == 10}">Top 10</option>
+        <option value="20" th:selected="${limit == 20}">Top 20</option>
+    </select>
+
+    <button type="submit">Lọc</button>
+</form>
+<canvas id="barChart"></canvas>
+
+<script th:inline="javascript">
+    let dataNV = /*[[${topNV}]]*/ [];
+
+    let labelsNV = dataNV.map(x => x.tenNhanVien);
+    let dataDoanhThu = dataNV.map(x => x.doanhThu);
+
+    new Chart(document.getElementById('barChart'), {
+        type: 'bar',
+        data: {
+            labels: labelsNV,
+            datasets: [{
+                label: 'Doanh thu',
+                data: dataDoanhThu,
+                borderWidth: 1
+            }]
+        }
+    });
+</script>
+</body>
+</html>

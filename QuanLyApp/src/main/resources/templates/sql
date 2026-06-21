@@ -1,0 +1,234 @@
+-- MySQL dump 10.13  Distrib 8.0.34, for macos13 (arm64)
+--
+-- Host: localhost    Database: quanlydb
+-- ------------------------------------------------------
+-- Server version	8.0.27
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!50503 SET NAMES utf8 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+-- =========================
+-- Table: NguoiDung
+-- =========================
+DROP TABLE IF EXISTS `NguoiDung`;
+CREATE TABLE `NguoiDung` (
+  `MaNguoiDung` INT NOT NULL AUTO_INCREMENT,
+  `HinhAnh` VARCHAR(255),
+  `TenDangNhap` VARCHAR(50) NOT NULL,
+  `MatKhau` VARCHAR(255) NOT NULL,
+  `VaiTro` VARCHAR(20) NOT NULL,
+  `TrangThai` VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
+  PRIMARY KEY (`MaNguoiDung`)
+) ENGINE=InnoDB;
+
+-- =========================
+-- Table: NhanVien
+-- =========================
+DROP TABLE IF EXISTS `NhanVien`;
+CREATE TABLE `NhanVien` (
+  `MaNhanVien` INT NOT NULL AUTO_INCREMENT,
+  `HoTen` VARCHAR(100),
+  `NgaySinh` DATE,
+  `MaNguoiDung` INT UNIQUE,
+  PRIMARY KEY (`MaNhanVien`),
+  CONSTRAINT `FK_NV_ND` FOREIGN KEY (`MaNguoiDung`)
+    REFERENCES `NguoiDung` (`MaNguoiDung`)
+) ENGINE=InnoDB;
+
+-- =========================
+-- Table: KhachHang
+-- =========================
+DROP TABLE IF EXISTS `KhachHang`;
+CREATE TABLE `KhachHang` (
+  `MaKhachHang` INT NOT NULL AUTO_INCREMENT,
+  `MaNguoiDung` INT UNIQUE,
+  `MaBan` INT UNIQUE,
+  PRIMARY KEY (`MaKhachHang`),
+  CONSTRAINT `FK_KH_ND` FOREIGN KEY (`MaNguoiDung`)
+    REFERENCES `NguoiDung` (`MaNguoiDung`),
+  CONSTRAINT `FK_KH_BAN` FOREIGN KEY (`MaBan`)
+    REFERENCES `BanAn` (`MaBan`)
+) ENGINE=InnoDB;
+
+-- =========================
+-- Table: BanAn
+-- =========================
+DROP TABLE IF EXISTS `BanAn`;
+CREATE TABLE `BanAn` (
+  `MaBan` INT NOT NULL AUTO_INCREMENT,
+  `TenBan` VARCHAR(50),
+  `SoCho` INT,
+  `TrangThai` VARCHAR(20),
+  PRIMARY KEY (`MaBan`)
+) ENGINE=InnoDB;
+
+-- =========================
+-- Table: LoaiSanPham
+-- =========================
+DROP TABLE IF EXISTS `LoaiSanPham`;
+CREATE TABLE `LoaiSanPham` (
+  `MaLoai` INT NOT NULL AUTO_INCREMENT,
+  `TenLoai` VARCHAR(100),
+  `Nhom` VARCHAR(50),
+  PRIMARY KEY (`MaLoai`)
+) ENGINE=InnoDB;
+
+-- =========================
+-- Table: SanPham
+-- =========================
+DROP TABLE IF EXISTS `SanPham`;
+CREATE TABLE `SanPham` (
+  `MaSanPham` INT NOT NULL AUTO_INCREMENT,
+  `TenSanPham` VARCHAR(100),
+  `Gia` DECIMAL(10,2),
+  `TrangThai` VARCHAR(20),
+  `GhiChu` TEXT,
+  `HinhAnh` VARCHAR(255),
+  `MaLoai` INT,
+  PRIMARY KEY (`MaSanPham`),
+  CONSTRAINT `FK_SP_LSP` FOREIGN KEY (`MaLoai`)
+    REFERENCES `LoaiSanPham` (`MaLoai`)
+) ENGINE=InnoDB;
+
+-- =========================
+-- Table: DonHang
+-- =========================
+DROP TABLE IF EXISTS `DonHang`;
+CREATE TABLE `DonHang` (
+  `MaDonHang` INT NOT NULL AUTO_INCREMENT,
+  `MaBan` INT,
+  `MaNhanVien` INT,
+  `TrangThai` VARCHAR(20),
+  `TongTien` DECIMAL(10,2),
+  `ThoiGianBatDau` DATETIME,
+  `GhiChu` VARCHAR(255),
+  PRIMARY KEY (`MaDonHang`),
+  CONSTRAINT `FK_DH_BAN` FOREIGN KEY (`MaBan`) REFERENCES `BanAn` (`MaBan`),
+  CONSTRAINT `FK_DH_NV` FOREIGN KEY (`MaNhanVien`) REFERENCES `NhanVien` (`MaNhanVien`)
+) ENGINE=InnoDB;
+
+-- =========================
+-- Table: ChiTietDonHang
+-- =========================
+DROP TABLE IF EXISTS `ChiTietDonHang`;
+CREATE TABLE `ChiTietDonHang` (
+  `MaDonHang` INT,
+  `MaSanPham` INT,
+  `SoLuong` INT,
+  `Gia` DECIMAL(10,2),
+  TrangThai VARCHAR(20) DEFAULT 'DANG_XU_LY',
+  PRIMARY KEY (`MaDonHang`, `MaSanPham`),
+  CONSTRAINT `FK_CTDH_DH` FOREIGN KEY (`MaDonHang`) REFERENCES `DonHang` (`MaDonHang`),
+  CONSTRAINT `FK_CTDH_SP` FOREIGN KEY (`MaSanPham`) REFERENCES `SanPham` (`MaSanPham`)
+) ENGINE=InnoDB;
+
+-- =========================
+-- Table: MaGiamGia
+-- =========================
+DROP TABLE IF EXISTS `MaGiamGia`;
+CREATE TABLE `MaGiamGia` (
+  `MaGiamGia` INT NOT NULL AUTO_INCREMENT,
+  `GiaTriGiam` DECIMAL(10,2),
+  `DieuKien` TEXT,
+  `NgayBatDau` DATE,
+  `NgayKetThuc` DATE,
+  PRIMARY KEY (`MaGiamGia`)
+) ENGINE=InnoDB;
+
+-- =========================
+-- Table: HoaDon
+-- =========================
+DROP TABLE IF EXISTS `HoaDon`;
+CREATE TABLE `HoaDon` (
+  `MaHoaDon` INT NOT NULL AUTO_INCREMENT,
+  `MaDonHang` INT UNIQUE,
+  `TongTien` DECIMAL(10,2),
+  `MaGiamGia` INT,
+  `ThanhTien` DECIMAL(10,2),
+  `ThoiGianThanhToan` DATETIME,
+  PRIMARY KEY (`MaHoaDon`),
+  CONSTRAINT `FK_HD_DH` FOREIGN KEY (`MaDonHang`) REFERENCES `DonHang` (`MaDonHang`),
+  CONSTRAINT `FK_HD_MGG` FOREIGN KEY (`MaGiamGia`) REFERENCES `MaGiamGia` (`MaGiamGia`)
+) ENGINE=InnoDB;
+
+-- =========================
+-- Table: Kho
+-- =========================
+DROP TABLE IF EXISTS `Kho`;
+CREATE TABLE `Kho` (
+  `MaKho` INT NOT NULL AUTO_INCREMENT,
+  `MaSanPham` INT,
+  `SoLuongTon` INT,
+  `NgayNhap` DATE,
+  `GiaNhap` DECIMAL(10,2),
+  `HanSuDung` DATE,
+  PRIMARY KEY (`MaKho`),
+  CONSTRAINT `FK_KHO_SP` FOREIGN KEY (`MaSanPham`) REFERENCES `SanPham` (`MaSanPham`)
+) ENGINE=InnoDB;
+
+-- =========================
+-- Table: PhieuNhap
+-- =========================
+DROP TABLE IF EXISTS `PhieuNhap`;
+CREATE TABLE `PhieuNhap` (
+  `MaPhieuNhap` INT NOT NULL AUTO_INCREMENT,
+  `NgayNhap` DATE,
+  `MaNhanVien` INT,
+  `TrangThai` VARCHAR(20),
+  PRIMARY KEY (`MaPhieuNhap`),
+  CONSTRAINT `FK_PN_NV` FOREIGN KEY (`MaNhanVien`) REFERENCES `NhanVien` (`MaNhanVien`)
+) ENGINE=InnoDB;
+
+-- =========================
+-- Table: ChiTietPhieuNhap
+-- =========================
+DROP TABLE IF EXISTS `ChiTietPhieuNhap`;
+CREATE TABLE `ChiTietPhieuNhap` (
+  `MaPhieuNhap` INT,
+  `MaSanPham` INT,
+  `SoLuong` INT,
+  `GiaNhap` DECIMAL(10,2),
+  `GhiChu` TEXT,
+  PRIMARY KEY (`MaPhieuNhap`, `MaSanPham`),
+  CONSTRAINT `FK_CTPN_PN` FOREIGN KEY (`MaPhieuNhap`) REFERENCES `PhieuNhap` (`MaPhieuNhap`),
+  CONSTRAINT `FK_CTPN_SP` FOREIGN KEY (`MaSanPham`) REFERENCES `SanPham` (`MaSanPham`)
+) ENGINE=InnoDB;
+
+-- =========================
+-- Table: PhanCong
+-- =========================
+DROP TABLE IF EXISTS `PhanCong`;
+-- CREATE TABLE `PhanCong` (
+--   `MaNhanVien` INT,
+--   `MaBan` INT,
+--   `NgayPhanCong` DATE,
+--   `Ca` VARCHAR(20),
+--   PRIMARY KEY (`MaNhanVien`, `MaBan`, `NgayPhanCong`, `Ca`),
+--   CONSTRAINT `FK_PC_NV` FOREIGN KEY (`MaNhanVien`) REFERENCES `NhanVien` (`MaNhanVien`),
+--   CONSTRAINT `FK_PC_BAN` FOREIGN KEY (`MaBan`) REFERENCES `BanAn` (`MaBan`)
+-- ) ENGINE=InnoDB;
+
+-- =========================
+-- Table: NhatKyChinhSuaDon
+-- =========================
+DROP TABLE IF EXISTS `NhatKyChinhSuaDon`;
+CREATE TABLE `NhatKyChinhSuaDon` (
+  `MaYeuCau` INT NOT NULL AUTO_INCREMENT,
+  `MaDonHang` INT,
+  `MaNhanVien` INT,
+  `HanhDong` VARCHAR(100),
+  `ThoiGian` DATETIME,
+  `NoiDungThayDoi` TEXT,
+  PRIMARY KEY (`MaYeuCau`),
+  CONSTRAINT `FK_NK_DH` FOREIGN KEY (`MaDonHang`) REFERENCES `DonHang` (`MaDonHang`),
+  CONSTRAINT `FK_NK_NV` FOREIGN KEY (`MaNhanVien`) REFERENCES `NhanVien` (`MaNhanVien`)
+) ENGINE=InnoDB;
+
+

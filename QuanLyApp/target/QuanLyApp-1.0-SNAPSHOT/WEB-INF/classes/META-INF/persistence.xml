@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="3.0" xmlns="https://jakarta.ee/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence https://jakarta.ee/xml/ns/persistence/persistence_3_0.xsd">
+  <!-- Define Persistence Unit -->
+  <persistence-unit name="my_persistence_unit" transaction-type="JTA">
+    <jta-data-source>jdbc/quanlydb</jta-data-source>
+    <class>com.hkn.pojo.Magiamgia</class>
+    <class>com.hkn.pojo.Sanpham</class>
+    <class>com.hkn.pojo.Kho</class>
+    <class>com.hkn.pojo.Donhang</class>
+    <class>com.hkn.pojo.Phancong</class>
+    <class>com.hkn.pojo.Nhatkychinhsuadon</class>
+    <class>com.hkn.pojo.Hoadon</class>
+    <class>com.hkn.pojo.Nhanvien</class>
+    <class>com.hkn.pojo.Chitietdonhang</class>
+    <class>com.hkn.pojo.Banan</class>
+    <class>com.hkn.pojo.Chitietphieunhap</class>
+    <class>com.hkn.pojo.Nguoidung</class>
+    <class>com.hkn.pojo.Loaisanpham</class>
+    <class>com.hkn.pojo.Khachhang</class>
+    <class>com.hkn.pojo.Phieunhap</class>
+  </persistence-unit>
+</persistence>

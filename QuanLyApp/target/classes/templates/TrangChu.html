@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <title>Nhà Hàng - Thực Đơn</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com"/>
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous"/>
+        <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Nunito:wght@300;400;600&display=swap" rel="stylesheet"/>
+        <style>
+            :root {
+                --cream: #fdf6ec;
+                --brown-dark: #2c1a0e;
+                --brown-mid: #6b3f1e;
+                --brown-light: #c8956c;
+                --gold: #d4a853;
+                --gold-light: #f0d080;
+                --white: #ffffff;
+                --shadow: 0 4px 24px rgba(44,26,14,0.12);
+                --green: #27ae60;
+                --purple: #8e44ad;
+                --orange: #e67e22;
+            }
+
+            * { box-sizing: border-box; margin: 0; padding: 0; }
+
+            body {
+                font-family: 'Nunito', sans-serif;
+                background-color: var(--cream);
+                color: var(--brown-dark);
+                min-height: 100vh;
+            }
+
+            /* ===== NAVBAR ===== */
+            nav {
+                background: var(--brown-dark);
+                padding: 0 2.5rem;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                height: 68px;
+                position: sticky;
+                top: 0;
+                z-index: 100;
+                box-shadow: 0 2px 16px rgba(0,0,0,0.3);
+            }
+
+            .nav-logo {
+                font-family: 'Playfair Display', serif;
+                font-size: 1.6rem;
+                color: var(--gold);
+                letter-spacing: 1px;
+                text-decoration: none;
+            }
+
+            .nav-links {
+                display: flex;
+                align-items: center;
+                gap: 1.8rem;
+                list-style: none;
+            }
+
+            .nav-links a {
+                color: #e8d8c4;
+                text-decoration: none;
+                font-size: 0.9rem;
+                font-weight: 600;
+                letter-spacing: 0.5px;
+                transition: color 0.2s;
+            }
+
+            .nav-links a:hover { color: var(--gold-light); }
+
+            .nav-user {
+                display: flex;
+                align-items: center;
+                gap: 0.7rem;
+                color: var(--gold-light);
+                font-size: 0.88rem;
+            }
+
+            .nav-user .avatar {
+                width: 34px; height: 34px;
+                border-radius: 50%;
+                background: var(--brown-mid);
+                border: 2px solid var(--gold);
+                display: flex; align-items: center; justify-content: center;
+                font-weight: 700; color: var(--gold); font-size: 0.85rem;
+            }
+
+            /* ===== HERO ===== */
+            .hero {
+                background: linear-gradient(135deg, var(--brown-dark) 0%, var(--brown-mid) 60%, var(--brown-light) 100%);
+                padding: 3.5rem 2.5rem 3rem;
+                text-align: center;
+                position: relative;
+                overflow: hidden;
+            }
+
+            .hero::before {
+                content: '';
+                position: absolute; inset: 0;
+                background: radial-gradient(ellipse at 70% 50%, rgba(212,168,83,0.18) 0%, transparent 70%);
+                pointer-events: none;
+            }
+
+            .hero h1 {
+                font-family: 'Playfair Display', serif;
+                font-size: 2.8rem;
+                color: var(--white);
+                margin-bottom: 0.5rem;
+                position: relative;
+            }
+
+            .hero h1 span { color: var(--gold-light); font-style: italic; }
+
+            .hero p {
+                color: #d4c0aa;
+                font-size: 1rem;
+                font-weight: 300;
+                letter-spacing: 1px;
+            }
+
+            .hero-divider {
+                width: 60px; height: 3px;
+                background: var(--gold);
+                margin: 1rem auto 0;
+                border-radius: 2px;
+            }
+
+            /* ===== NHÓM TABS ===== */
+            .group-tabs {
+                background: var(--white);
+                padding: 1rem 2.5rem;
+                display: flex;
+                gap: 0.7rem;
+                flex-wrap: wrap;
+                border-bottom: 2px solid #f0e6d6;
+                box-shadow: var(--shadow);
+            }
+
+            .group-tab {
+                padding: 0.45rem 1.2rem;
+                border-radius: 30px;
+                font-size: 0.85rem;
+                font-weight: 600;
+                text-decoration: none;
+                border: 2px solid transparent;
+                transition: all 0.2s;
+                color: var(--brown-mid);
+                background: var(--cream);
+            }
+
+            .group-tab:hover, .group-tab.active {
+                background: var(--brown-dark);
+                color: var(--gold-light);
+                border-color: var(--brown-dark);
+            }
+
+            /* ===== ADMIN TOOLBAR ===== */
+            .admin-toolbar {
+                background: #fffaf3;
+                border: 1.5px dashed var(--gold);
+                border-radius: 12px;
+                padding: 0.75rem 1.2rem;
+                display: flex;
+                align-items: center;
+                gap: 0.8rem;
+                flex-wrap: wrap;
+                margin-bottom: 1.8rem;
+            }
+
+            .admin-toolbar-label {
+                font-size: 0.78rem;
+                font-weight: 700;
+                color: var(--brown-mid);
+                text-transform: uppercase;
+                letter-spacing: 0.6px;
+                white-space: nowrap;
+                padding-right: 0.4rem;
+                border-right: 1.5px solid #e0d0bc;
+            }
+
+            .btn-admin {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.38rem;
+                padding: 0.46rem 1.1rem;
+                border-radius: 8px;
+                font-family: 'Nunito', sans-serif;
+                font-size: 0.84rem;
+                font-weight: 700;
+                text-decoration: none;
+                border: none;
+                cursor: pointer;
+                transition: opacity 0.2s, transform 0.15s;
+                white-space: nowrap;
+            }
+
+            .btn-admin:hover { opacity: 0.86; transform: translateY(-1px); }
+
+            .btn-create-product { background: var(--green); color: white; }
+            .btn-create-coupon  { background: var(--purple); color: white; }
+
+            /* ===== MAIN LAYOUT ===== */
+            .main-wrapper {
+                display: flex;
+                max-width: 1280px;
+                margin: 0 auto;
+                padding: 2rem 1.5rem 3rem;
+                gap: 2rem;
+            }
+
+            /* ===== SIDEBAR ===== */
+            .sidebar { width: 240px; flex-shrink: 0; }
+
+            .sidebar-title {
+                font-family: 'Playfair Display', serif;
+                font-size: 1.1rem;
+                color: var(--brown-dark);
+                padding-bottom: 0.6rem;
+                border-bottom: 2px solid var(--gold);
+                margin-bottom: 1rem;
+                letter-spacing: 0.5px;
+            }
+
+            .menu-category { margin-bottom: 0.3rem; }
+
+            .menu-category a {
+                display: flex;
+                align-items: center;
+                gap: 0.6rem;
+                padding: 0.6rem 1rem;
+                border-radius: 10px;
+                text-decoration: none;
+                color: var(--brown-mid);
+                font-size: 0.9rem;
+                font-weight: 600;
+                transition: all 0.2s;
+                position: relative;
+            }
+
+            .menu-category a:hover, .menu-category a.active {
+                background: var(--brown-dark);
+                color: var(--gold-light);
+            }
+
+            .menu-category a .cat-dot {
+                width: 8px; height: 8px;
+                border-radius: 50%;
+                background: var(--gold);
+                flex-shrink: 0;
+            }
+
+            /* ===== CONTENT ===== */
+            .content { flex: 1; }
+
+            .section-header {
+                display: flex;
+                align-items: center;
+                gap: 1rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .section-header h2 {
+                font-family: 'Playfair Display', serif;
+                font-size: 1.6rem;
+                color: var(--brown-dark);
+                white-space: nowrap;
+            }
+
+            .section-header .line {
+                flex: 1;
+                height: 1px;
+                background: linear-gradient(to right, var(--gold), transparent);
+            }
+
+            /* ===== CARD GRID ===== */
+            .card-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+                gap: 1.2rem;
+            }
+
+            /* ===== PRODUCT CARD ===== */
+            .category-card {
+                background: var(--white);
+                border-radius: 16px;
+                overflow: hidden;
+                box-shadow: var(--shadow);
+                transition: transform 0.25s, box-shadow 0.25s;
+                color: inherit;
+                display: flex;
+                flex-direction: column;
+                position: relative;
+            }
+
+            .category-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 12px 32px rgba(44,26,14,0.18);
+            }
+
+            /* Nút Sửa – overlay góc trên phải */
+            .btn-edit-product {
+                position: absolute;
+                top: 8px;
+                right: 8px;
+                z-index: 10;
+                display: inline-flex;
+                align-items: center;
+                gap: 0.28rem;
+                padding: 0.28rem 0.65rem;
+                background: var(--orange);
+                color: white;
+                border-radius: 20px;
+                font-family: 'Nunito', sans-serif;
+                font-size: 0.74rem;
+                font-weight: 700;
+                text-decoration: none;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.22);
+                transition: opacity 0.2s, transform 0.15s;
+            }
+
+            .btn-edit-product:hover { opacity: 0.87; transform: scale(1.06); }
+
+            .card-img-wrap {
+                height: 120px;
+                background: linear-gradient(135deg, var(--brown-mid), var(--brown-light));
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 2.8rem;
+            }
+
+            .card-body {
+                padding: 1rem;
+                flex: 1;
+            }
+
+            .card-body h3 {
+                font-family: 'Playfair Display', serif;
+                font-size: 1rem;
+                color: var(--brown-dark);
+                margin-bottom: 0.25rem;
+            }
+
+            .card-body .price {
+                color: #c0392b;
+                font-weight: 700;
+                font-size: 0.92rem;
+                margin: 0.25rem 0;
+            }
+
+            .nhom-tag {
+                display: inline-block;
+                background: #f0e6d6;
+                color: var(--brown-mid);
+                font-size: 0.75rem;
+                padding: 0.2rem 0.6rem;
+                border-radius: 20px;
+                font-weight: 600;
+            }
+
+            /* Cart */
+            .cart-add-btn {
+                margin-top: 7px;
+                padding: 0.36rem 1rem;
+                background: var(--brown-dark);
+                color: var(--gold-light);
+                border: none;
+                border-radius: 7px;
+                font-family: 'Nunito', sans-serif;
+                font-size: 0.82rem;
+                font-weight: 700;
+                cursor: pointer;
+                transition: opacity 0.18s;
+            }
+
+            .cart-add-btn:hover { opacity: 0.84; }
+
+            .stepper {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                margin-top: 7px;
+            }
+
+            .stepper-btn {
+                width: 28px; height: 28px;
+                border-radius: 50%;
+                border: 2px solid var(--brown-mid);
+                background: var(--cream);
+                color: var(--brown-dark);
+                font-size: 1rem;
+                font-weight: 700;
+                cursor: pointer;
+                line-height: 1;
+                transition: background 0.15s, color 0.15s;
+            }
+
+            .stepper-btn:hover { background: var(--brown-dark); color: var(--gold-light); border-color: var(--brown-dark); }
+
+            .stepper-qty {
+                min-width: 22px;
+                text-align: center;
+                font-weight: 700;
+                font-size: 0.9rem;
+            }
+
+            /* ===== EMPTY STATE ===== */
+            .empty-state {
+                text-align: center;
+                padding: 3rem 1rem;
+                color: var(--brown-light);
+            }
+
+            .empty-state .icon { font-size: 3rem; margin-bottom: 0.8rem; }
+            .empty-state p { font-size: 1rem; }
+
+            /* ===== FOOTER ===== */
+            footer {
+                background: var(--brown-dark);
+                color: #b09070;
+                text-align: center;
+                padding: 1.2rem;
+                font-size: 0.82rem;
+                letter-spacing: 0.5px;
+            }
+
+            footer span { color: var(--gold); }
+
+            /* ===== RESPONSIVE ===== */
+            @media (max-width: 768px) {
+                .main-wrapper { flex-direction: column; }
+                .sidebar { width: 100%; }
+                .hero h1 { font-size: 2rem; }
+                .card-grid { grid-template-columns: repeat(2, 1fr); }
+                nav { padding: 0 1rem; }
+                .nav-links { gap: 1rem; }
+            }
+        </style>
+    </head>
+    <body>
+
+        <!-- ===== NAVBAR ===== -->
+        <nav>
+            <a class="nav-logo" th:href="@{/}">🍽 Nhà Hàng HKN</a>
+            <ul class="nav-links">
+                <li><a th:href="@{/}">Trang Chủ</a></li>
+                <li th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
+                    <a th:href="@{/admin/users}">Quản Lí Người Dùng</a></li>
+                <li sec:authorize="hasRole('ADMIN')">
+                    <a th:href="@{/stats}">Thống Kê</a></li>
+                <li th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
+                    <a th:href="@{/phieunhap}">Quản Lí Kho</a></li>
+                <li th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
+                    <a th:href="@{/logs}">Nhật Ký Chỉnh Sửa</a></li>
+                <li sec:authorize="hasAnyRole('ADMIN','NHANVIEN')">
+                    <a th:href="@{/orders}">Quản Lí Đơn Hàng</a></li>
+                <li th:if="${#authorization.expression('hasRole(''KHACHHANG'')')}">
+                    <a th:href="@{/cart}">
+                        🛒 Giỏ Hàng (<span th:text="${cart != null ? cart.soLuong : 0}">0</span>)
+                    </a>
+                </li>
+            </ul>
+            <div class="nav-user" th:if="${username != null}">
+                <div class="avatar" th:text="${#strings.substring(username, 0, 1).toUpperCase()}">U</div>
+                <span th:text="${username}">Người dùng</span>
+                <form th:action="@{/logout}" method="post" style="display:inline;">
+                    <button type="submit"
+                            style="background:none;border:none;color:#f08080;cursor:pointer;font-family:'Nunito',sans-serif;">
+                        Đăng xuất
+                    </button>
+                </form>
+            </div>
+            <div class="nav-user" th:unless="${username != null}">
+                <a href="/login" style="color:var(--gold-light);text-decoration:none;font-weight:600;">Đăng nhập</a>
+            </div>
+        </nav>
+
+        <!-- ===== HERO ===== -->
+        <div class="hero">
+            <h1>Thực Đơn <span>Đặc Sắc</span></h1>
+            <p>Khám phá các món ăn tinh tế – Hương vị đậm đà, phục vụ tận tâm</p>
+            <div class="hero-divider"></div>
+        </div>
+
+        <!-- ===== NHÓM FILTER TABS ===== -->
+        <div class="group-tabs" th:if="${danhSachLoai != null and !danhSachLoai.isEmpty()}">
+            <a class="group-tab"
+               th:classappend="${nhomHienTai == null ? 'active' : ''}"
+               href="/home">Tất cả</a>
+            <th:block th:each="nhom : ${nhoms}">
+                <a class="group-tab"
+                   th:href="@{/(nhom=${nhom})}"
+                   th:classappend="${nhomHienTai == nhom ? 'active' : ''}"
+                   th:text="${nhom}">
+                </a>
+            </th:block>
+        </div>
+
+        <!-- ===== MAIN CONTENT ===== -->
+        <div class="main-wrapper">
+
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <div class="sidebar-title">📋 Danh Mục</div>
+                <div th:if="${danhSachLoai != null and !danhSachLoai.isEmpty()}">
+                    <div class="menu-category" th:each="loai : ${danhSachLoai}">
+                        <a th:href="@{/home(nhom=${loai.nhom})}"
+                           th:classappend="${nhomHienTai == loai.nhom ? 'active' : ''}">
+                            <span class="cat-dot"></span>
+                            <span th:text="${loai.tenLoai}">Tên loại</span>
+                        </a>
+                    </div>
+                </div>
+                <div th:unless="${danhSachLoai != null and !danhSachLoai.isEmpty()}"
+                     style="color:#b09070;font-size:0.85rem;padding:0.5rem 1rem;">
+                    Chưa có danh mục
+                </div>
+            </aside>
+
+            <!-- Nội dung chính -->
+            <main class="content">
+
+                <!-- ===== ADMIN TOOLBAR – chỉ hiện với ADMIN ===== -->
+                <div class="admin-toolbar" sec:authorize="hasAnyRole('ADMIN','NHANVIEN')"
+                     >
+                    <span class="admin-toolbar-label" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">⚙️ Quản trị viên</span>
+
+                    <a  th:if="${#authorization.expression('hasRole(''ADMIN'')')}" th:href="@{/admin/products/new}" class="btn-admin btn-create-product">
+                        ➕ Tạo sản phẩm mới
+                    </a>
+                    
+                    <a th:if="${#authorization.expression('hasRole(''NHANVIEN'')')}" th:href="@{/phieunhap/create}" class="btn-admin btn-create-coupon">
+                        🏷️ Tạo phiếu nhập
+                    </a>
+
+                    <a th:if="${#authorization.expression('hasRole(''ADMIN'')')}" th:href="@{/admin/coupons}" class="btn-admin btn-create-coupon">
+                        🏷️ Tạo mã giảm giá mới
+                    </a>
+                </div>
+
+                <!-- Danh sách sản phẩm -->
+                <div>
+                    <div class="section-header">
+                        <h2>🍽 Danh sách sản phẩm</h2>
+                        <div class="line"></div>
+                    </div>
+
+                    <div class="card-grid"
+                         th:if="${sanphams != null and !sanphams.isEmpty()}">
+
+                        <div class="category-card" th:each="sp : ${sanphams}">
+
+                            <!-- Nút Sửa (chỉ ADMIN) – overlay góc trên phải -->
+                            <a sec:authorize="hasAnyRole('ADMIN','NHANVIEN')"
+                               th:href="@{/admin/products/edit/{id}(id=${sp.maSanPham})}"
+                               class="btn-edit-product">
+                                ✏️ Sửa
+                            </a>
+
+                            <!-- Hình ảnh -->
+                            <div class="card-img-wrap">
+                                <img th:src="${sp.hinhAnh}"
+                                     alt="img"
+                                     style="width:100%;height:100%;object-fit:cover;"
+                                     onerror="this.style.display='none'"/>
+                            </div>
+
+                            <!-- Nội dung card -->
+                            <div class="card-body">
+                                <h3 th:text="${sp.tenSanPham}">Tên sản phẩm</h3>
+
+                                <p class="price"
+                                   th:text="${#numbers.formatDecimal(sp.gia, 0, 'COMMA', 0, 'POINT')} + ' đ'">
+                                    100,000 đ
+                                </p>
+
+                                <span class="nhom-tag"
+                                      th:text="${sp.trangThai != null ? sp.trangThai : 'Còn bán'}">
+                                    Trạng thái
+                                </span>
+
+                                <!-- Giỏ hàng (chỉ KHACHHANG) -->
+                                <div th:if="${#authorization.expression('hasRole(''KHACHHANG'')')}"
+                                     th:with="qty=${cartQty != null and cartQty[sp.maSanPham] != null ? cartQty[sp.maSanPham] : 0}">
+
+                                    <form th:if="${qty == 0}"
+                                          th:action="@{/cart/add}" method="post">
+                                        <input type="hidden" name="maSanPham" th:value="${sp.maSanPham}"/>
+                                        <input type="hidden" name="soLuong" value="1"/>
+                                        <button type="submit" class="cart-add-btn">🛒 Thêm</button>
+                                    </form>
+
+                                    <div th:if="${qty > 0}" class="stepper">
+                                        <form th:action="@{/cart/update}" method="post">
+                                            <input type="hidden" name="maSanPham" th:value="${sp.maSanPham}"/>
+                                            <input type="hidden" name="soLuong" th:value="${qty - 1}"/>
+                                            <button type="submit" class="stepper-btn">−</button>
+                                        </form>
+                                        <span class="stepper-qty" th:text="${qty}">1</span>
+                                        <form th:action="@{/cart/update}" method="post">
+                                            <input type="hidden" name="maSanPham" th:value="${sp.maSanPham}"/>
+                                            <input type="hidden" name="soLuong" th:value="${qty + 1}"/>
+                                            <button type="submit" class="stepper-btn">+</button>
+                                        </form>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="empty-state"
+                         th:unless="${sanphams != null and !sanphams.isEmpty()}">
+                        <div class="icon">🍽</div>
+                        <p>Chưa có sản phẩm nào.</p>
+                    </div>
+                </div>
+
+                <div class="empty-state"
+                     th:unless="${danhSachLoai != null and !danhSachLoai.isEmpty()}">
+                    <div class="icon">🍽</div>
+                    <p>Chưa có danh mục sản phẩm nào.</p>
+                </div>
+
+            </main>
+        </div>
+
+        <!-- ===== FOOTER ===== -->
+        <footer>
+            &copy; 2025 <span>Nhà Hàng HKN</span> – Tất cả quyền được bảo lưu.
+        </footer>
+
+    </body>
+</html>

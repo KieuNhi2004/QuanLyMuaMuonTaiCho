@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Nhà Hàng - Thống Kê</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous"/>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+    <style>
+        :root {
+            --cream: #fdf6ec;
+            --brown-dark: #2c1a0e;
+            --brown-mid: #6b3f1e;
+            --brown-light: #c8956c;
+            --gold: #d4a853;
+            --gold-light: #f0d080;
+            --white: #ffffff;
+            --shadow: 0 4px 24px rgba(44,26,14,0.12);
+            --green: #27ae60;
+            --purple: #8e44ad;
+            --orange: #e67e22;
+            --red: #c0392b;
+            --blue: #2980b9;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: var(--cream);
+            color: var(--brown-dark);
+            min-height: 100vh;
+        }
+
+        /* NAVBAR */
+        nav {
+            background: var(--brown-dark);
+            padding: 0 2.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 68px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 16px rgba(0,0,0,0.3);
+        }
+        .nav-logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.6rem;
+            color: var(--gold);
+            letter-spacing: 1px;
+            text-decoration: none;
+        }
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 1.8rem;
+            list-style: none;
+        }
+        .nav-links a {
+            color: #e8d8c4;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            transition: color 0.2s;
+        }
+        .nav-links a:hover, .nav-links a.active { color: var(--gold-light); }
+        .nav-user {
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            color: var(--gold-light);
+            font-size: 0.88rem;
+        }
+        .nav-user .avatar {
+            width: 34px; height: 34px;
+            border-radius: 50%;
+            background: var(--brown-mid);
+            border: 2px solid var(--gold);
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; color: var(--gold); font-size: 0.85rem;
+        }
+
+        /* HERO */
+        .hero {
+            background: linear-gradient(135deg, var(--brown-dark) 0%, var(--brown-mid) 60%, var(--brown-light) 100%);
+            padding: 3rem 2.5rem 2.5rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero::before {
+            content: '';
+            position: absolute; inset: 0;
+            background: radial-gradient(ellipse at 70% 50%, rgba(212,168,83,0.18) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .hero h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.4rem;
+            color: var(--white);
+            margin-bottom: 0.4rem;
+            position: relative;
+        }
+        .hero h1 span { color: var(--gold-light); font-style: italic; }
+        .hero p { color: #d4c0aa; font-size: 0.95rem; font-weight: 300; letter-spacing: 1px; }
+        .hero-divider {
+            width: 60px; height: 3px;
+            background: var(--gold);
+            margin: 0.9rem auto 0;
+            border-radius: 2px;
+        }
+
+        /* MAIN */
+        .main-wrapper {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem 3rem;
+        }
+
+        /* FILTER CARD */
+        .filter-card {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 1.5rem 2rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+        }
+        .filter-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.1rem;
+            color: var(--brown-dark);
+            margin-bottom: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .filter-title::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(to right, var(--gold), transparent);
+            margin-left: 0.5rem;
+        }
+        .filter-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: flex-end;
+        }
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+        .filter-group label {
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--brown-mid);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .filter-group input[type="date"],
+        .filter-group select {
+            padding: 0.5rem 0.9rem;
+            border: 1.5px solid #e0cdb8;
+            border-radius: 10px;
+            font-family: 'Nunito', sans-serif;
+            font-size: 0.88rem;
+            color: var(--brown-dark);
+            background: var(--cream);
+            outline: none;
+            transition: border-color 0.2s;
+            cursor: pointer;
+        }
+        .filter-group input[type="date"]:focus,
+        .filter-group select:focus {
+            border-color: var(--gold);
+        }
+
+        /* TYPE TABS */
+        .type-tabs {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 0;
+        }
+        .type-tab {
+            padding: 0.5rem 1.2rem;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--brown-mid);
+            background: var(--cream);
+            font-family: 'Nunito', sans-serif;
+        }
+        .type-tab:hover { background: #f0e6d6; }
+        .type-tab.active {
+            background: var(--brown-dark);
+            color: var(--gold-light);
+            border-color: var(--brown-dark);
+        }
+
+        .btn-apply {
+            padding: 0.55rem 1.6rem;
+            background: var(--gold);
+            color: var(--brown-dark);
+            border: none;
+            border-radius: 10px;
+            font-family: 'Nunito', sans-serif;
+            font-size: 0.88rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: opacity 0.2s, transform 0.15s;
+            white-space: nowrap;
+        }
+        .btn-apply:hover { opacity: 0.86; transform: translateY(-1px); }
+
+        /* SUMMARY CARDS */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .summary-card {
+            background: var(--white);
+            border-radius: 14px;
+            padding: 1.2rem 1.3rem;
+            box-shadow: var(--shadow);
+            border-left: 4px solid var(--gold);
+            position: relative;
+            overflow: hidden;
+        }
+        .summary-card::before {
+            content: '';
+            position: absolute;
+            top: -20px; right: -20px;
+            width: 80px; height: 80px;
+            border-radius: 50%;
+            opacity: 0.06;
+            background: var(--brown-dark);
+        }
+        .summary-card.green { border-left-color: var(--green); }
+        .summary-card.blue  { border-left-color: var(--blue); }
+        .summary-card.purple{ border-left-color: var(--purple); }
+        .summary-card.orange{ border-left-color: var(--orange); }
+        .summary-label {
+            font-size: 0.76rem;
+            font-weight: 700;
+            color: var(--brown-mid);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.4rem;
+        }
+        .summary-value {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            color: var(--brown-dark);
+            font-weight: 700;
+            line-height: 1;
+        }
+        .summary-sub {
+            font-size: 0.78rem;
+            color: var(--green);
+            margin-top: 0.3rem;
+            font-weight: 600;
+        }
+        .summary-sub.down { color: var(--red); }
+
+        /* CHARTS GRID */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        @media (max-width: 900px) {
+            .charts-grid { grid-template-columns: 1fr; }
+        }
+        .chart-card {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+        }
+        .chart-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.05rem;
+            color: var(--brown-dark);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .chart-badge {
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 0.2rem 0.65rem;
+            border-radius: 20px;
+            background: #f0e6d6;
+            color: var(--brown-mid);
+            font-family: 'Nunito', sans-serif;
+        }
+
+        /* TOP LIST */
+        .top-list { list-style: none; }
+        .top-list li {
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            padding: 0.65rem 0;
+            border-bottom: 1px solid #f0e6d6;
+            font-size: 0.87rem;
+        }
+        .top-list li:last-child { border-bottom: none; }
+        .rank {
+            width: 24px; height: 24px;
+            border-radius: 50%;
+            background: var(--brown-dark);
+            color: var(--gold-light);
+            font-size: 0.72rem;
+            font-weight: 700;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .rank.gold   { background: var(--gold); color: var(--brown-dark); }
+        .rank.silver { background: #aaa; color: white; }
+        .rank.bronze { background: #c87533; color: white; }
+        .top-name { flex: 1; font-weight: 600; color: var(--brown-dark); }
+        .top-value { font-weight: 700; color: var(--brown-mid); font-size: 0.85rem; }
+        .top-bar-wrap {
+            width: 80px; height: 6px;
+            background: #f0e6d6;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        .top-bar { height: 100%; border-radius: 3px; background: var(--gold); transition: width 0.5s; }
+
+        /* SECTION HEADER */
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.2rem;
+        }
+        .section-header h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            color: var(--brown-dark);
+            white-space: nowrap;
+        }
+        .section-header .line {
+            flex: 1; height: 1px;
+            background: linear-gradient(to right, var(--gold), transparent);
+        }
+
+        /* SUGGESTION CARDS */
+        .suggest-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .suggest-card {
+            background: var(--white);
+            border-radius: 14px;
+            padding: 1.2rem 1.4rem;
+            box-shadow: var(--shadow);
+            border-top: 4px solid var(--gold);
+            display: flex;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+        .suggest-card.green { border-top-color: var(--green); }
+        .suggest-card.purple { border-top-color: var(--purple); }
+        .suggest-icon {
+            font-size: 2.2rem;
+            flex-shrink: 0;
+        }
+        .suggest-label {
+            font-size: 0.73rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--brown-mid);
+            margin-bottom: 0.2rem;
+        }
+        .suggest-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.05rem;
+            color: var(--brown-dark);
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+        .suggest-stat {
+            font-size: 0.82rem;
+            color: var(--brown-mid);
+            font-weight: 600;
+        }
+
+        /* DETAIL TABLE */
+        .table-card {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 1.5rem;
+            overflow-x: auto;
+        }
+        table.stats-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.87rem;
+        }
+        .stats-table thead tr {
+            background: var(--brown-dark);
+            color: var(--gold-light);
+        }
+        .stats-table thead th {
+            padding: 0.75rem 1rem;
+            font-weight: 700;
+            text-align: left;
+            font-size: 0.8rem;
+            letter-spacing: 0.5px;
+        }
+        .stats-table tbody tr { border-bottom: 1px solid #f0e6d6; }
+        .stats-table tbody tr:hover { background: #fdf0e0; }
+        .stats-table tbody td { padding: 0.7rem 1rem; color: var(--brown-dark); }
+        .badge-status {
+            padding: 0.2rem 0.7rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+        .badge-good { background: #eafaf1; color: var(--green); }
+        .badge-med  { background: #fef9e7; color: #d4ac0d; }
+        .badge-low  { background: #fdedec; color: var(--red); }
+
+        footer {
+            background: var(--brown-dark);
+            color: #b09070;
+            text-align: center;
+            padding: 1.2rem;
+            font-size: 0.82rem;
+            letter-spacing: 0.5px;
+        }
+        footer span { color: var(--gold); }
+
+        @media (max-width: 768px) {
+            nav { padding: 0 1rem; }
+            .nav-links { gap: 1rem; }
+            .hero h1 { font-size: 1.8rem; }
+            .filter-row { flex-direction: column; }
+            .charts-grid { grid-template-columns: 1fr; }
+        }
+
+        /* Legend custom */
+        .chart-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 10px;
+            font-size: 0.78rem;
+            color: var(--brown-mid);
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-weight: 600;
+        }
+        .legend-dot {
+            width: 10px; height: 10px;
+            border-radius: 2px;
+            flex-shrink: 0;
+        }
+    </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav>
+    <a class="nav-logo" href="#">☕ Café Sách HKN</a>
+    <ul class="nav-links">
+        <li><a href="#">Trang Chủ</a></li>
+        <li><a href="#">Quản Lí Người Dùng</a></li>
+        <li><a href="#" class="active">Thống Kê</a></li>
+        <li><a href="#">Quản Lí Kho</a></li>
+        <li><a href="#">Nhật Ký Chỉnh Sửa</a></li>
+        <li><a href="#">Quản Lí Đơn Hàng</a></li>
+    </ul>
+    <div class="nav-user">
+        <div class="avatar">A</div>
+        <span>Admin</span>
+        <a href="#" style="color:#f08080;font-weight:600;text-decoration:none;">Đăng xuất</a>
+    </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+    <h1>Bảng <span>Thống Kê</span></h1>
+    <p>Phân tích doanh thu – Sản phẩm – Nhân viên – Sách cho mượn</p>
+    <div class="hero-divider"></div>
+</div>
+
+<div class="main-wrapper">
+
+    <!-- FILTER CARD -->
+    <div class="filter-card">
+        <div class="filter-title">🔍 Bộ Lọc Thống Kê</div>
+        <div style="margin-bottom:1rem;">
+            <div class="type-tabs">
+                <button class="type-tab active" onclick="switchTab(this,'banhang')">📊 Bán hàng</button>
+                <button class="type-tab" onclick="switchTab(this,'muon')">📚 Cho mượn sách</button>
+                <button class="type-tab" onclick="switchTab(this,'nhanvien')">👤 Theo nhân viên</button>
+            </div>
+        </div>
+        <div class="filter-row">
+            <div class="filter-group">
+                <label>Từ ngày</label>
+                <input type="date" id="fromDate" value="2025-01-01"/>
+            </div>
+            <div class="filter-group">
+                <label>Đến ngày</label>
+                <input type="date" id="toDate" value="2025-06-30"/>
+            </div>
+            <div class="filter-group" id="fg-nhanvien" style="display:none;">
+                <label>Nhân viên</label>
+                <select id="selNhanVien">
+                    <option value="">-- Tất cả --</option>
+                    <option>Nguyễn Minh Tuấn</option>
+                    <option>Trần Thị Lan</option>
+                    <option>Lê Văn Hùng</option>
+                    <option>Phạm Thu Hằng</option>
+                </select>
+            </div>
+            <div class="filter-group" id="fg-sp" style="">
+                <label>Sản phẩm</label>
+                <select id="selSanPham">
+                    <option value="">-- Tất cả --</option>
+                    <option>Cà phê sữa đá</option>
+                    <option>Matcha latte</option>
+                    <option>Cold brew</option>
+                    <option>Bánh croissant</option>
+                    <option>Cheesecake chanh leo</option>
+                </select>
+            </div>
+            <div class="filter-group" id="fg-theloai" style="display:none;">
+                <label>Thể loại sách</label>
+                <select>
+                    <option value="">-- Tất cả --</option>
+                    <option>Văn học</option>
+                    <option>Kinh tế</option>
+                    <option>Khoa học</option>
+                    <option>Thiếu nhi</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>&nbsp;</label>
+                <button class="btn-apply" onclick="applyFilter()">🔎 Áp dụng</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SUMMARY CARDS -->
+    <div class="summary-grid" id="summarySection">
+        <div class="summary-card green">
+            <div class="summary-label">Doanh thu</div>
+            <div class="summary-value" id="sv-doanhthu">48.2M</div>
+            <div class="summary-sub">↑ 12.4% so với kỳ trước</div>
+        </div>
+        <div class="summary-card blue">
+            <div class="summary-label">Số đơn hàng</div>
+            <div class="summary-value" id="sv-donhang">1,284</div>
+            <div class="summary-sub">↑ 8.1% so với kỳ trước</div>
+        </div>
+        <div class="summary-card purple">
+            <div class="summary-label">Sách cho mượn</div>
+            <div class="summary-value" id="sv-muonsach">376</div>
+            <div class="summary-sub down">↓ 3.2% so với kỳ trước</div>
+        </div>
+<!--        <div class="summary-card orange">
+            <div class="summary-label">Khách hàng mới</div>
+            <div class="summary-value" id="sv-khach">219</div>
+            <div class="summary-sub">↑ 5.7% so với kỳ trước</div>
+        </div>-->
+        <div class="summary-card">
+            <div class="summary-label">TB/đơn hàng</div>
+            <div class="summary-value" id="sv-tb">37.5K</div>
+            <div class="summary-sub">↑ 3.9% so với kỳ trước</div>
+        </div>
+    </div>
+
+    <!-- GỢI Ý NỔI BẬT -->
+    <div class="section-header">
+        <h2>⭐ Gợi Ý Nổi Bật</h2>
+        <div class="line"></div>
+    </div>
+    <div class="suggest-grid" id="suggestSection">
+        <div class="suggest-card">
+            <div class="suggest-icon">☕</div>
+            <div>
+                <div class="suggest-label">Sản phẩm bán chạy nhất</div>
+                <div class="suggest-name">Cà phê sữa đá</div>
+                <div class="suggest-stat">842 ly – Doanh thu 12.6M đ</div>
+            </div>
+        </div>
+        <div class="suggest-card green">
+            <div class="suggest-icon">👑</div>
+            <div>
+                <div class="suggest-label">Nhân viên bán được nhiều nhất</div>
+                <div class="suggest-name">Nguyễn Minh Tuấn</div>
+                <div class="suggest-stat">347 đơn – Doanh thu 15.8M đ</div>
+            </div>
+        </div>
+        <div class="suggest-card purple">
+            <div class="suggest-icon">📖</div>
+            <div>
+                <div class="suggest-label">Sách mượn nhiều nhất</div>
+                <div class="suggest-name">Nhà Giả Kim</div>
+                <div class="suggest-stat">58 lần mượn – Tần suất cao</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CHARTS - BAN HANG & MUON -->
+    <div id="chartSection">
+        <div class="charts-grid">
+            <!-- LINE CHART -->
+            <div class="chart-card">
+                <div class="chart-title">
+                    <span id="lineChartTitle">📈 Doanh thu theo thời gian</span>
+                    <span class="chart-badge" id="lineChartBadge">Tháng 1–6/2025</span>
+                </div>
+                <div class="chart-legend" id="legendLine">
+                    <span class="legend-item"><span class="legend-dot" style="background:#d4a853;"></span>Doanh thu (triệu đ)</span>
+                    <span class="legend-item"><span class="legend-dot" style="background:#6b3f1e; width:10px; height:3px; border-radius:1px;"></span>Số đơn</span>
+                </div>
+                <div style="position: relative; width: 100%; height: 280px;">
+                    <canvas id="lineChart" role="img" aria-label="Biểu đồ đường thống kê doanh thu và số đơn theo tháng từ tháng 1 đến tháng 6 năm 2025">Dữ liệu doanh thu 6 tháng đầu 2025.</canvas>
+                </div>
+            </div>
+            <!-- TOP LIST -->
+            <div class="chart-card">
+                <div class="chart-title">
+                    <span id="topListTitle">🏆 Top sản phẩm bán chạy</span>
+                </div>
+                <ul class="top-list" id="topList">
+                    <li>
+                        <span class="rank gold">1</span>
+                        <span class="top-name">Cà phê sữa đá</span>
+                        <div class="top-bar-wrap"><div class="top-bar" style="width:100%"></div></div>
+                        <span class="top-value">842</span>
+                    </li>
+                    <li>
+                        <span class="rank silver">2</span>
+                        <span class="top-name">Matcha latte</span>
+                        <div class="top-bar-wrap"><div class="top-bar" style="width:72%;background:#27ae60"></div></div>
+                        <span class="top-value">607</span>
+                    </li>
+                    <li>
+                        <span class="rank bronze">3</span>
+                        <span class="top-name">Cold brew</span>
+                        <div class="top-bar-wrap"><div class="top-bar" style="width:60%;background:#2980b9"></div></div>
+                        <span class="top-value">504</span>
+                    </li>
+                    <li>
+                        <span class="rank">4</span>
+                        <span class="top-name">Cheesecake chanh leo</span>
+                        <div class="top-bar-wrap"><div class="top-bar" style="width:44%;background:#8e44ad"></div></div>
+                        <span class="top-value">371</span>
+                    </li>
+                    <li>
+                        <span class="rank">5</span>
+                        <span class="top-name">Bánh croissant</span>
+                        <div class="top-bar-wrap"><div class="top-bar" style="width:33%;background:#e67e22"></div></div>
+                        <span class="top-value">277</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- BAR CHART theo nhân viên -->
+        <div class="charts-grid">
+            <div class="chart-card">
+                <div class="chart-title">
+                    <span>📊 Doanh thu theo nhân viên</span>
+                    <span class="chart-badge">6 tháng đầu 2025</span>
+                </div>
+                <div class="chart-legend">
+                    <span class="legend-item"><span class="legend-dot" style="background:#d4a853;"></span>Doanh thu (triệu đ)</span>
+                </div>
+                <div style="position: relative; width: 100%; height: 240px;">
+                    <canvas id="barNhanVien" role="img" aria-label="Biểu đồ cột doanh thu theo từng nhân viên trong 6 tháng đầu năm 2025">Doanh thu theo nhân viên 6 tháng đầu 2025.</canvas>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <div class="chart-title">
+                    <span>📚 Tần suất cho mượn theo thể loại</span>
+                    <span class="chart-badge">6 tháng</span>
+                </div>
+                <div class="chart-legend" id="legendDoughnut">
+                    <span class="legend-item"><span class="legend-dot" style="background:#d4a853;"></span>Văn học 34%</span>
+                    <span class="legend-item"><span class="legend-dot" style="background:#27ae60;"></span>Kinh tế 22%</span>
+                    <span class="legend-item"><span class="legend-dot" style="background:#2980b9;"></span>Khoa học 18%</span>
+                    <span class="legend-item"><span class="legend-dot" style="background:#8e44ad;"></span>Thiếu nhi 14%</span>
+                    <span class="legend-item"><span class="legend-dot" style="background:#e67e22;"></span>Khác 12%</span>
+                </div>
+                <div style="position: relative; width: 100%; height: 220px;">
+                    <canvas id="doughnutChart" role="img" aria-label="Biểu đồ tròn tần suất cho mượn sách theo thể loại">Văn học 34%, Kinh tế 22%, Khoa học 18%, Thiếu nhi 14%, Khác 12%.</canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- DETAIL TABLE -->
+        <div class="table-card">
+            <div class="chart-title" style="margin-bottom:1rem;">
+                <span id="tableTitle">📋 Chi tiết giao dịch bán hàng</span>
+                <span class="chart-badge" id="tableBadge">Tháng 1–6/2025</span>
+            </div>
+            <table class="stats-table" id="detailTable">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Sản phẩm / Sách</th>
+                        <th>Nhân viên</th>
+                        <th>Số lượng</th>
+                        <th>Doanh thu</th>
+                        <th>Tháng cao nhất</th>
+                        <th>Trạng thái</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+    &copy; 2025 <span>Café Sách HKN</span> – Tất cả quyền được bảo lưu.
+</footer>
+
+<script>
+const DATA = {
+    banhang: {
+        lineLabels: ['T1','T2','T3','T4','T5','T6'],
+        lineRevenue: [6.2, 7.8, 8.5, 9.1, 8.0, 8.6],
+        lineOrders:  [180, 210, 235, 256, 218, 247],
+        topItems: [
+            {name:'Cà phê sữa đá', val:842, color:'#d4a853', pct:100},
+            {name:'Matcha latte',   val:607, color:'#27ae60', pct:72},
+            {name:'Cold brew',      val:504, color:'#2980b9', pct:60},
+            {name:'Cheesecake chanh leo', val:371, color:'#8e44ad', pct:44},
+            {name:'Bánh croissant', val:277, color:'#e67e22', pct:33},
+        ],
+        table: [
+            ['Cà phê sữa đá','Nguyễn Minh Tuấn',842,'12,630,000 đ','Tháng 4','Cao'],
+            ['Matcha latte','Trần Thị Lan',607,'9,105,000 đ','Tháng 3','Cao'],
+            ['Cold brew','Lê Văn Hùng',504,'8,064,000 đ','Tháng 5','Cao'],
+            ['Cheesecake chanh leo','Phạm Thu Hằng',371,'7,420,000 đ','Tháng 4','Trung bình'],
+            ['Bánh croissant','Nguyễn Minh Tuấn',277,'4,155,000 đ','Tháng 2','Thấp'],
+            ['Espresso đá','Trần Thị Lan',255,'3,825,000 đ','Tháng 6','Thấp'],
+            ['Trà đào cam sả','Lê Văn Hùng',234,'4,212,000 đ','Tháng 5','Trung bình'],
+            ['Bánh tiramisu','Phạm Thu Hằng',198,'5,940,000 đ','Tháng 3','Trung bình'],
+        ],
+        suggest: ['Cà phê sữa đá','842 ly – Doanh thu 12.6M đ','Nguyễn Minh Tuấn','347 đơn – 15.8M đ','Nhà Giả Kim','58 lần mượn'],
+        summary: ['48.2M','1,284','376','219','37.5K'],
+        topTitle: '🏆 Top sản phẩm bán chạy',
+    },
+    muon: {
+        lineLabels: ['T1','T2','T3','T4','T5','T6'],
+        lineRevenue: [52, 60, 71, 65, 68, 60],
+        lineOrders:  [],
+        topItems: [
+            {name:'Nhà Giả Kim',       val:58, color:'#d4a853', pct:100},
+            {name:'Đắc Nhân Tâm',      val:49, color:'#27ae60', pct:84},
+            {name:'Sapiens',            val:41, color:'#2980b9', pct:71},
+            {name:'Atomic Habits',     val:38, color:'#8e44ad', pct:66},
+            {name:'Sách Không Tên',    val:29, color:'#e67e22', pct:50},
+        ],
+        table: [
+            ['Nhà Giả Kim','Phạm Thu Hằng',58,'Văn học','Tháng 3','Cao'],
+            ['Đắc Nhân Tâm','Nguyễn Minh Tuấn',49,'Kinh tế','Tháng 4','Cao'],
+            ['Sapiens','Trần Thị Lan',41,'Khoa học','Tháng 2','Cao'],
+            ['Atomic Habits','Lê Văn Hùng',38,'Kinh tế','Tháng 5','Trung bình'],
+            ['Sách Không Tên','Phạm Thu Hằng',29,'Văn học','Tháng 1','Thấp'],
+            ['Harry Potter T1','Trần Thị Lan',27,'Thiếu nhi','Tháng 6','Thấp'],
+        ],
+        suggest: ['Nhà Giả Kim','58 lần – Tần suất cao','Phạm Thu Hằng','148 lần xử lý mượn','Văn học','128 lần – Phổ biến nhất'],
+        summary: ['376','148','62','31','3.2'],
+        topTitle: '🏆 Top sách mượn nhiều',
+    },
+    nhanvien: {
+        lineLabels: ['T1','T2','T3','T4','T5','T6'],
+        lineRevenue: [7.2, 8.1, 9.0, 10.2, 7.9, 9.4],
+        lineOrders:  [95, 110, 124, 135, 102, 120],
+        topItems: [
+            {name:'Nguyễn Minh Tuấn', val:347, color:'#d4a853', pct:100},
+            {name:'Trần Thị Lan',     val:298, color:'#27ae60', pct:86},
+            {name:'Lê Văn Hùng',      val:251, color:'#2980b9', pct:72},
+            {name:'Phạm Thu Hằng',    val:219, color:'#8e44ad', pct:63},
+        ],
+        table: [
+            ['Nguyễn Minh Tuấn','Ca sáng',347,'15,800,000 đ','Tháng 4','Cao'],
+            ['Trần Thị Lan','Ca chiều',298,'12,400,000 đ','Tháng 3','Cao'],
+            ['Lê Văn Hùng','Ca tối',251,'10,900,000 đ','Tháng 5','Trung bình'],
+            ['Phạm Thu Hằng','Ca sáng',219,'9,100,000 đ','Tháng 2','Trung bình'],
+        ],
+        suggest: ['Nguyễn Minh Tuấn','347 đơn – 15.8M đ','Cà phê sữa đá','Sản phẩm bán chạy nhất','Ca sáng','Doanh thu cao nhất'],
+        summary: ['52.2M','1,115','—','4','46.8K'],
+        topTitle: '🏆 Top nhân viên',
+    }
+};
+
+let currentTab = 'banhang';
+let lineChart, barChart, doughnut;
+
+function switchTab(btn, tab) {
+    document.querySelectorAll('.type-tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    currentTab = tab;
+    document.getElementById('fg-nhanvien').style.display = (tab === 'nhanvien') ? '' : 'none';
+    document.getElementById('fg-sp').style.display = (tab === 'banhang') ? '' : 'none';
+    document.getElementById('fg-theloai').style.display = (tab === 'muon') ? '' : 'none';
+    applyFilter();
+}
+
+function applyFilter() {
+    const d = DATA[currentTab];
+    updateSummary(d);
+    updateSuggest(d);
+    updateTopList(d);
+    updateTable(d);
+    updateLineChart(d);
+}
+
+function updateSummary(d) {
+    const labels = currentTab === 'muon'
+        ? ['Tổng lượt mượn','Lượt trả đúng hạn','Lượt quá hạn','Sách độc giả mượn','TB ngày/lượt']
+        : currentTab === 'nhanvien'
+        ? ['Doanh thu','Số đơn','Sách cho mượn','Nhân viên','TB/đơn']
+        : ['Doanh thu','Số đơn hàng','Sách cho mượn','Khách hàng mới','TB/đơn hàng'];
+    const vals = d.summary;
+    const cards = document.querySelectorAll('.summary-card');
+    cards.forEach((c, i) => {
+        c.querySelector('.summary-label').textContent = labels[i] || '';
+        c.querySelector('.summary-value').textContent = vals[i] || '—';
+    });
+}
+
+function updateSuggest(d) {
+    const sg = d.suggest;
+    const labels_1 = currentTab==='muon'
+        ? ['Sách mượn nhiều nhất','Nhân viên xử lý nhiều nhất','Thể loại phổ biến nhất']
+        : currentTab==='nhanvien'
+        ? ['Nhân viên bán nhiều nhất','Sản phẩm bán chạy','Ca làm hiệu quả nhất']
+        : ['Sản phẩm bán chạy nhất','Nhân viên bán nhiều nhất','Sách mượn nhiều nhất'];
+    const icons = currentTab==='muon' ? ['📖','👤','🏷️'] : currentTab==='nhanvien' ? ['👑','☕','⏰'] : ['☕','👑','📖'];
+    const cards = document.querySelectorAll('.suggest-card');
+    cards.forEach((c, i) => {
+        c.querySelector('.suggest-icon').textContent = icons[i];
+        c.querySelector('.suggest-label').textContent = labels_1[i];
+        c.querySelector('.suggest-name').textContent = sg[i*2] || '—';
+        c.querySelector('.suggest-stat').textContent = sg[i*2+1] || '';
+    });
+}
+
+function updateTopList(d) {
+    document.getElementById('topListTitle').textContent = d.topTitle;
+    const ul = document.getElementById('topList');
+    const rankClass = ['gold','silver','bronze','',''];
+    ul.innerHTML = d.topItems.map((item, i) => `
+        <li>
+            <span class="rank ${rankClass[i]}">${i+1}</span>
+            <span class="top-name">${item.name}</span>
+            <div class="top-bar-wrap"><div class="top-bar" style="width:${item.pct}%;background:${item.color}"></div></div>
+            <span class="top-value">${item.val}</span>
+        </li>
+    `).join('');
+}
+
+function updateTable(d) {
+    const isNV = currentTab==='nhanvien';
+    const isMuon = currentTab==='muon';
+    const heads = isNV
+        ? ['#','Nhân viên','Ca làm','Số đơn','Doanh thu','Tháng cao nhất','Trạng thái']
+        : isMuon
+        ? ['#','Sách','Nhân viên phụ trách','Lượt mượn','Thể loại','Tháng cao nhất','Trạng thái']
+        : ['#','Sản phẩm','Nhân viên','Số lượng','Doanh thu','Tháng cao nhất','Trạng thái'];
+    document.querySelector('.stats-table thead tr').innerHTML = heads.map(h=>`<th>${h}</th>`).join('');
+    document.getElementById('tableTitle').textContent =
+        isNV ? '📋 Chi tiết theo nhân viên' : isMuon ? '📋 Chi tiết sách cho mượn' : '📋 Chi tiết giao dịch bán hàng';
+    const tbody = document.getElementById('tableBody');
+    tbody.innerHTML = d.table.map((row, i) => {
+        const status = row[row.length-1];
+        const cls = status==='Cao' ? 'badge-good' : status==='Trung bình' ? 'badge-med' : 'badge-low';
+        const cells = [i+1, ...row.slice(0,-1), `<span class="badge-status ${cls}">${status}</span>`];
+        return `<tr>${cells.map(c=>`<td>${c}</td>`).join('')}</tr>`;
+    }).join('');
+}
+
+function updateLineChart(d) {
+    const isRevenue = currentTab !== 'muon';
+    const label1 = currentTab==='muon' ? 'Lượt mượn' : 'Doanh thu (triệu đ)';
+    document.getElementById('lineChartTitle').textContent =
+        currentTab==='muon' ? '📈 Tần suất cho mượn theo thời gian'
+        : currentTab==='nhanvien' ? '📈 Doanh thu nhân viên theo tháng'
+        : '📈 Doanh thu theo thời gian';
+
+    const datasets = [{
+        label: label1,
+        data: d.lineRevenue,
+        borderColor: '#d4a853',
+        backgroundColor: 'rgba(212,168,83,0.12)',
+        pointBackgroundColor: '#d4a853',
+        pointRadius: 5,
+        tension: 0.4,
+        fill: true,
+        borderWidth: 2.5,
+        pointStyle: 'circle',
+    }];
+    if (d.lineOrders && d.lineOrders.length) {
+        datasets.push({
+            label: 'Số đơn',
+            data: d.lineOrders,
+            borderColor: '#6b3f1e',
+            backgroundColor: 'transparent',
+            pointBackgroundColor: '#6b3f1e',
+            pointRadius: 4,
+            tension: 0.4,
+            fill: false,
+            borderWidth: 2,
+            borderDash: [6,3],
+            pointStyle: 'triangle',
+            yAxisID: 'y2',
+        });
+    }
+    const legendDiv = document.getElementById('legendLine');
+    legendDiv.innerHTML = `<span class="legend-item"><span class="legend-dot" style="background:#d4a853;"></span>${label1}</span>` +
+        (d.lineOrders&&d.lineOrders.length ? `<span class="legend-item"><span class="legend-dot" style="background:#6b3f1e; width:10px; height:3px; border-radius:1px;"></span>Số đơn</span>` : '');
+
+    if (lineChart) lineChart.destroy();
+    const ctx = document.getElementById('lineChart').getContext('2d');
+    lineChart = new Chart(ctx, {
+        type: 'line',
+        data: { labels: d.lineLabels, datasets },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: { color: 'rgba(107,63,30,0.08)' },
+                    ticks: { color: '#6b3f1e', font: { family: 'Nunito', size: 11 } }
+                },
+                y2: d.lineOrders&&d.lineOrders.length ? {
+                    position: 'right',
+                    beginAtZero: true,
+                    grid: { drawOnChartArea: false },
+                    ticks: { color: '#6b3f1e', font: { family: 'Nunito', size: 11 } }
+                } : undefined,
+                x: {
+                    grid: { color: 'rgba(107,63,30,0.06)' },
+                    ticks: { color: '#6b3f1e', font: { family: 'Nunito', size: 11 } }
+                }
+            }
+        }
+    });
+}
+
+function initBarChart() {
+    const ctx = document.getElementById('barNhanVien').getContext('2d');
+    barChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Nguyễn Minh Tuấn','Trần Thị Lan','Lê Văn Hùng','Phạm Thu Hằng'],
+            datasets: [{
+                label: 'Doanh thu (triệu đ)',
+                data: [15.8, 12.4, 10.9, 9.1],
+                backgroundColor: ['#d4a853','#27ae60','#2980b9','#8e44ad'],
+                borderRadius: 6,
+                borderSkipped: false,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: { color: 'rgba(107,63,30,0.08)' },
+                    ticks: { color: '#6b3f1e', font: { family: 'Nunito', size: 11 },
+                        callback: v => v + 'M' }
+                },
+                x: {
+                    grid: { display: false },
+                    ticks: {
+                        color: '#6b3f1e',
+                        font: { family: 'Nunito', size: 10 },
+                        maxRotation: 15,
+                        autoSkip: false
+                    }
+                }
+            }
+        }
+    });
+}
+
+function initDoughnut() {
+    const ctx = document.getElementById('doughnutChart').getContext('2d');
+    doughnut = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Văn học','Kinh tế','Khoa học','Thiếu nhi','Khác'],
+            datasets: [{
+                data: [34, 22, 18, 14, 12],
+                backgroundColor: ['#d4a853','#27ae60','#2980b9','#8e44ad','#e67e22'],
+                borderWidth: 2,
+                borderColor: '#fdf6ec',
+                hoverOffset: 6,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '62%',
+            plugins: { legend: { display: false }, tooltip: {
+                callbacks: { label: ctx => ' ' + ctx.label + ': ' + ctx.parsed + '%' }
+            }}
+        }
+    });
+}
+
+window.onload = function() {
+    applyFilter();
+    initBarChart();
+    initDoughnut();
+};
+</script>
+</body>
+</html>
